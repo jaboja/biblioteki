@@ -6,14 +6,171 @@
 	objectVersion = 77;
 	objects = {
 
+/* Begin PBXBuildFile section */
+		9A434C0D301F89EA00757CA8 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 9A434C0C301F89EA00757CA8 /* Assets.xcassets */; };
+		9A434C4C301F8D1000757CA8 /* WidgetKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 9A434C4B301F8D1000757CA8 /* WidgetKit.framework */; };
+		9A434C4E301F8D1000757CA8 /* SwiftUI.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 9A434C4D301F8D1000757CA8 /* SwiftUI.framework */; };
+		9A434C5D301F8D1100757CA8 /* LibraryWidgetExtensionExtension.appex in Embed Foundation Extensions */ = {isa = PBXBuildFile; fileRef = 9A434C49301F8D1000757CA8 /* LibraryWidgetExtensionExtension.appex */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
+/* End PBXBuildFile section */
+
+/* Begin PBXContainerItemProxy section */
+		9A434C5B301F8D1100757CA8 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 9A434BFD301F89EA00757CA8 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = 9A434C48301F8D1000757CA8;
+			remoteInfo = LibraryWidgetExtensionExtension;
+		};
+/* End PBXContainerItemProxy section */
+
+/* Begin PBXCopyFilesBuildPhase section */
+		9A434C62301F8D1100757CA8 /* Embed Foundation Extensions */ = {
+			isa = PBXCopyFilesBuildPhase;
+			buildActionMask = 2147483647;
+			dstPath = "";
+			dstSubfolderSpec = 13;
+			files = (
+				9A434C5D301F8D1100757CA8 /* LibraryWidgetExtensionExtension.appex in Embed Foundation Extensions */,
+			);
+			name = "Embed Foundation Extensions";
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXCopyFilesBuildPhase section */
+
 /* Begin PBXFileReference section */
 		9A434C05301F89EA00757CA8 /* LibraryWidget.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = LibraryWidget.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		9A434C0C301F89EA00757CA8 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
+		9A434C49301F8D1000757CA8 /* LibraryWidgetExtensionExtension.appex */ = {isa = PBXFileReference; explicitFileType = "wrapper.app-extension"; includeInIndex = 0; path = LibraryWidgetExtensionExtension.appex; sourceTree = BUILT_PRODUCTS_DIR; };
+		9A434C4B301F8D1000757CA8 /* WidgetKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = WidgetKit.framework; path = System/Library/Frameworks/WidgetKit.framework; sourceTree = SDKROOT; };
+		9A434C4D301F8D1000757CA8 /* SwiftUI.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = SwiftUI.framework; path = System/Library/Frameworks/SwiftUI.framework; sourceTree = SDKROOT; };
+		9A434C63301F8D2E00757CA8 /* LibraryWidgetExtensionExtension.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = LibraryWidgetExtensionExtension.entitlements; sourceTree = "<group>"; };
 /* End PBXFileReference section */
+
+/* Begin PBXFileSystemSynchronizedBuildFileExceptionSet section */
+		9A434C89301F927F00757CA8 /* Exceptions for "Config" folder in "LibraryWidget" target */ = {
+			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
+			membershipExceptions = (
+				AccountStore.swift,
+				LibraryAccount.swift,
+			);
+			target = 9A434C04301F89EA00757CA8 /* LibraryWidget */;
+		};
+		9A434C8B301F927F00757CA8 /* Exceptions for "LibraryWidgetExtension" folder in "LibraryWidgetExtensionExtension" target */ = {
+			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
+			membershipExceptions = (
+				AppIntent.swift,
+				Info.plist,
+				LibraryWidgetExtension.swift,
+				LoanWidgetView.swift,
+			);
+			target = 9A434C48301F8D1000757CA8 /* LibraryWidgetExtensionExtension */;
+		};
+		9A434C8C301F927F00757CA8 /* Exceptions for "Config" folder in "LibraryWidgetExtensionExtension" target */ = {
+			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
+			membershipExceptions = (
+				AccountStore.swift,
+				LibraryAccount.swift,
+			);
+			target = 9A434C48301F8D1000757CA8 /* LibraryWidgetExtensionExtension */;
+		};
+		9A434C8D301F927F00757CA8 /* Exceptions for "Models" folder in "LibraryWidget" target */ = {
+			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
+			membershipExceptions = (
+				Loan.swift,
+			);
+			target = 9A434C04301F89EA00757CA8 /* LibraryWidget */;
+		};
+		9A434C8E301F927F00757CA8 /* Exceptions for "Models" folder in "LibraryWidgetExtensionExtension" target */ = {
+			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
+			membershipExceptions = (
+				Loan.swift,
+			);
+			target = 9A434C48301F8D1000757CA8 /* LibraryWidgetExtensionExtension */;
+		};
+		9A434C8F301F927F00757CA8 /* Exceptions for "Network" folder in "LibraryWidget" target */ = {
+			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
+			membershipExceptions = (
+				LoanFetcher.swift,
+				PrimoClient.swift,
+			);
+			target = 9A434C04301F89EA00757CA8 /* LibraryWidget */;
+		};
+		9A434C90301F927F00757CA8 /* Exceptions for "Network" folder in "LibraryWidgetExtensionExtension" target */ = {
+			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
+			membershipExceptions = (
+				LoanFetcher.swift,
+				PrimoClient.swift,
+			);
+			target = 9A434C48301F8D1000757CA8 /* LibraryWidgetExtensionExtension */;
+		};
+		9A434C91301F927F00757CA8 /* Exceptions for "Views" folder in "LibraryWidget" target */ = {
+			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
+			membershipExceptions = (
+				AccountListView.swift,
+				AddAccountView.swift,
+			);
+			target = 9A434C04301F89EA00757CA8 /* LibraryWidget */;
+		};
+		9A434C96301F94B600757CA8 /* Exceptions for "LibraryWidgetExtension" folder in "LibraryWidget" target */ = {
+			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
+			membershipExceptions = (
+				AppIntent.swift,
+				Info.plist,
+				LibraryWidgetExtension.swift,
+				LoanWidgetView.swift,
+			);
+			target = 9A434C04301F89EA00757CA8 /* LibraryWidget */;
+		};
+/* End PBXFileSystemSynchronizedBuildFileExceptionSet section */
 
 /* Begin PBXFileSystemSynchronizedRootGroup section */
 		9A434C07301F89EA00757CA8 /* LibraryWidget */ = {
 			isa = PBXFileSystemSynchronizedRootGroup;
 			path = LibraryWidget;
+			sourceTree = "<group>";
+		};
+		9A434C6F301F927E00757CA8 /* Config */ = {
+			isa = PBXFileSystemSynchronizedRootGroup;
+			exceptions = (
+				9A434C89301F927F00757CA8 /* Exceptions for "Config" folder in "LibraryWidget" target */,
+				9A434C8C301F927F00757CA8 /* Exceptions for "Config" folder in "LibraryWidgetExtensionExtension" target */,
+			);
+			path = Config;
+			sourceTree = "<group>";
+		};
+		9A434C71301F927E00757CA8 /* Models */ = {
+			isa = PBXFileSystemSynchronizedRootGroup;
+			exceptions = (
+				9A434C8D301F927F00757CA8 /* Exceptions for "Models" folder in "LibraryWidget" target */,
+				9A434C8E301F927F00757CA8 /* Exceptions for "Models" folder in "LibraryWidgetExtensionExtension" target */,
+			);
+			path = Models;
+			sourceTree = "<group>";
+		};
+		9A434C74301F927E00757CA8 /* Network */ = {
+			isa = PBXFileSystemSynchronizedRootGroup;
+			exceptions = (
+				9A434C8F301F927F00757CA8 /* Exceptions for "Network" folder in "LibraryWidget" target */,
+				9A434C90301F927F00757CA8 /* Exceptions for "Network" folder in "LibraryWidgetExtensionExtension" target */,
+			);
+			path = Network;
+			sourceTree = "<group>";
+		};
+		9A434C77301F927E00757CA8 /* Views */ = {
+			isa = PBXFileSystemSynchronizedRootGroup;
+			exceptions = (
+				9A434C91301F927F00757CA8 /* Exceptions for "Views" folder in "LibraryWidget" target */,
+			);
+			path = Views;
+			sourceTree = "<group>";
+		};
+		9A434C7A301F927E00757CA8 /* LibraryWidgetExtension */ = {
+			isa = PBXFileSystemSynchronizedRootGroup;
+			exceptions = (
+				9A434C96301F94B600757CA8 /* Exceptions for "LibraryWidgetExtension" folder in "LibraryWidget" target */,
+				9A434C8B301F927F00757CA8 /* Exceptions for "LibraryWidgetExtension" folder in "LibraryWidgetExtensionExtension" target */,
+			);
+			path = LibraryWidgetExtension;
 			sourceTree = "<group>";
 		};
 /* End PBXFileSystemSynchronizedRootGroup section */
@@ -26,14 +183,31 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
+		9A434C46301F8D1000757CA8 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				9A434C4E301F8D1000757CA8 /* SwiftUI.framework in Frameworks */,
+				9A434C4C301F8D1000757CA8 /* WidgetKit.framework in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
 		9A434BFC301F89EA00757CA8 = {
 			isa = PBXGroup;
 			children = (
+				9A434C0C301F89EA00757CA8 /* Assets.xcassets */,
 				9A434C07301F89EA00757CA8 /* LibraryWidget */,
+				9A434C4A301F8D1000757CA8 /* Frameworks */,
 				9A434C06301F89EA00757CA8 /* Products */,
+				9A434C6F301F927E00757CA8 /* Config */,
+				9A434C71301F927E00757CA8 /* Models */,
+				9A434C74301F927E00757CA8 /* Network */,
+				9A434C77301F927E00757CA8 /* Views */,
+				9A434C7A301F927E00757CA8 /* LibraryWidgetExtension */,
+				9A434C63301F8D2E00757CA8 /* LibraryWidgetExtensionExtension.entitlements */,
 			);
 			sourceTree = "<group>";
 		};
@@ -41,8 +215,18 @@
 			isa = PBXGroup;
 			children = (
 				9A434C05301F89EA00757CA8 /* LibraryWidget.app */,
+				9A434C49301F8D1000757CA8 /* LibraryWidgetExtensionExtension.appex */,
 			);
 			name = Products;
+			sourceTree = "<group>";
+		};
+		9A434C4A301F8D1000757CA8 /* Frameworks */ = {
+			isa = PBXGroup;
+			children = (
+				9A434C4B301F8D1000757CA8 /* WidgetKit.framework */,
+				9A434C4D301F8D1000757CA8 /* SwiftUI.framework */,
+			);
+			name = Frameworks;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -55,13 +239,16 @@
 				9A434C01301F89EA00757CA8 /* Sources */,
 				9A434C02301F89EA00757CA8 /* Frameworks */,
 				9A434C03301F89EA00757CA8 /* Resources */,
+				9A434C62301F8D1100757CA8 /* Embed Foundation Extensions */,
 			);
 			buildRules = (
 			);
 			dependencies = (
+				9A434C5C301F8D1100757CA8 /* PBXTargetDependency */,
 			);
 			fileSystemSynchronizedGroups = (
 				9A434C07301F89EA00757CA8 /* LibraryWidget */,
+				9A434C7A301F927E00757CA8 /* LibraryWidgetExtension */,
 			);
 			name = LibraryWidget;
 			packageProductDependencies = (
@@ -69,6 +256,25 @@
 			productName = LibraryWidget;
 			productReference = 9A434C05301F89EA00757CA8 /* LibraryWidget.app */;
 			productType = "com.apple.product-type.application";
+		};
+		9A434C48301F8D1000757CA8 /* LibraryWidgetExtensionExtension */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 9A434C5F301F8D1100757CA8 /* Build configuration list for PBXNativeTarget "LibraryWidgetExtensionExtension" */;
+			buildPhases = (
+				9A434C45301F8D1000757CA8 /* Sources */,
+				9A434C46301F8D1000757CA8 /* Frameworks */,
+				9A434C47301F8D1000757CA8 /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = LibraryWidgetExtensionExtension;
+			packageProductDependencies = (
+			);
+			productName = LibraryWidgetExtensionExtension;
+			productReference = 9A434C49301F8D1000757CA8 /* LibraryWidgetExtensionExtension.appex */;
+			productType = "com.apple.product-type.app-extension";
 		};
 /* End PBXNativeTarget section */
 
@@ -83,14 +289,17 @@
 					9A434C04301F89EA00757CA8 = {
 						CreatedOnToolsVersion = 26.6;
 					};
+					9A434C48301F8D1000757CA8 = {
+						CreatedOnToolsVersion = 26.6;
+					};
 				};
 			};
 			buildConfigurationList = 9A434C00301F89EA00757CA8 /* Build configuration list for PBXProject "LibraryWidget" */;
-			developmentRegion = en;
+			developmentRegion = pl;
 			hasScannedForEncodings = 0;
 			knownRegions = (
-				en,
 				Base,
+				pl,
 			);
 			mainGroup = 9A434BFC301F89EA00757CA8;
 			minimizedProjectReferenceProxies = 1;
@@ -100,12 +309,21 @@
 			projectRoot = "";
 			targets = (
 				9A434C04301F89EA00757CA8 /* LibraryWidget */,
+				9A434C48301F8D1000757CA8 /* LibraryWidgetExtensionExtension */,
 			);
 		};
 /* End PBXProject section */
 
 /* Begin PBXResourcesBuildPhase section */
 		9A434C03301F89EA00757CA8 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				9A434C0D301F89EA00757CA8 /* Assets.xcassets in Resources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		9A434C47301F8D1000757CA8 /* Resources */ = {
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
@@ -122,7 +340,22 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
+		9A434C45301F8D1000757CA8 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 /* End PBXSourcesBuildPhase section */
+
+/* Begin PBXTargetDependency section */
+		9A434C5C301F8D1100757CA8 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = 9A434C48301F8D1000757CA8 /* LibraryWidgetExtensionExtension */;
+			targetProxy = 9A434C5B301F8D1100757CA8 /* PBXContainerItemProxy */;
+		};
+/* End PBXTargetDependency section */
 
 /* Begin XCBuildConfiguration section */
 		9A434C0E301F89EA00757CA8 /* Debug */ = {
@@ -248,11 +481,24 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				CODE_SIGN_ENTITLEMENTS = LibraryWidget/LibraryWidget.entitlements;
+				"CODE_SIGN_IDENTITY[sdk=macosx*]" = "Apple Development";
 				CODE_SIGN_STYLE = Automatic;
 				COMBINE_HIDPI_IMAGES = YES;
 				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = W9AG2GQTFR;
 				ENABLE_APP_SANDBOX = YES;
+				ENABLE_INCOMING_NETWORK_CONNECTIONS = NO;
+				ENABLE_OUTGOING_NETWORK_CONNECTIONS = YES;
 				ENABLE_PREVIEWS = YES;
+				ENABLE_RESOURCE_ACCESS_AUDIO_INPUT = NO;
+				ENABLE_RESOURCE_ACCESS_BLUETOOTH = NO;
+				ENABLE_RESOURCE_ACCESS_CALENDARS = NO;
+				ENABLE_RESOURCE_ACCESS_CAMERA = NO;
+				ENABLE_RESOURCE_ACCESS_CONTACTS = NO;
+				ENABLE_RESOURCE_ACCESS_LOCATION = NO;
+				ENABLE_RESOURCE_ACCESS_PRINTING = NO;
+				ENABLE_RESOURCE_ACCESS_USB = NO;
 				ENABLE_USER_SELECTED_FILES = readonly;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_KEY_NSHumanReadableCopyright = "";
@@ -278,11 +524,24 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				CODE_SIGN_ENTITLEMENTS = LibraryWidget/LibraryWidget.entitlements;
+				"CODE_SIGN_IDENTITY[sdk=macosx*]" = "Apple Development";
 				CODE_SIGN_STYLE = Automatic;
 				COMBINE_HIDPI_IMAGES = YES;
 				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = W9AG2GQTFR;
 				ENABLE_APP_SANDBOX = YES;
+				ENABLE_INCOMING_NETWORK_CONNECTIONS = NO;
+				ENABLE_OUTGOING_NETWORK_CONNECTIONS = YES;
 				ENABLE_PREVIEWS = YES;
+				ENABLE_RESOURCE_ACCESS_AUDIO_INPUT = NO;
+				ENABLE_RESOURCE_ACCESS_BLUETOOTH = NO;
+				ENABLE_RESOURCE_ACCESS_CALENDARS = NO;
+				ENABLE_RESOURCE_ACCESS_CAMERA = NO;
+				ENABLE_RESOURCE_ACCESS_CONTACTS = NO;
+				ENABLE_RESOURCE_ACCESS_LOCATION = NO;
+				ENABLE_RESOURCE_ACCESS_PRINTING = NO;
+				ENABLE_RESOURCE_ACCESS_USB = NO;
 				ENABLE_USER_SELECTED_FILES = readonly;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_KEY_NSHumanReadableCopyright = "";
@@ -297,6 +556,92 @@
 				STRING_CATALOG_GENERATE_SYMBOLS = YES;
 				SWIFT_APPROACHABLE_CONCURRENCY = YES;
 				SWIFT_DEFAULT_ACTOR_ISOLATION = MainActor;
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_UPCOMING_FEATURE_MEMBER_IMPORT_VISIBILITY = YES;
+				SWIFT_VERSION = 5.0;
+			};
+			name = Release;
+		};
+		9A434C60301F8D1100757CA8 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				ASSETCATALOG_COMPILER_WIDGET_BACKGROUND_COLOR_NAME = WidgetBackground;
+				CODE_SIGN_ENTITLEMENTS = LibraryWidgetExtensionExtension.entitlements;
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = W9AG2GQTFR;
+				ENABLE_APP_SANDBOX = YES;
+				ENABLE_INCOMING_NETWORK_CONNECTIONS = NO;
+				ENABLE_OUTGOING_NETWORK_CONNECTIONS = YES;
+				ENABLE_RESOURCE_ACCESS_AUDIO_INPUT = NO;
+				ENABLE_RESOURCE_ACCESS_BLUETOOTH = NO;
+				ENABLE_RESOURCE_ACCESS_CALENDARS = NO;
+				ENABLE_RESOURCE_ACCESS_CAMERA = NO;
+				ENABLE_RESOURCE_ACCESS_CONTACTS = NO;
+				ENABLE_RESOURCE_ACCESS_LOCATION = NO;
+				ENABLE_RESOURCE_ACCESS_PRINTING = NO;
+				ENABLE_RESOURCE_ACCESS_USB = NO;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = LibraryWidgetExtension/Info.plist;
+				INFOPLIST_KEY_CFBundleDisplayName = LibraryWidgetExtension;
+				INFOPLIST_KEY_NSHumanReadableCopyright = "";
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/../Frameworks",
+					"@executable_path/../../../../Frameworks",
+				);
+				MACOSX_DEPLOYMENT_TARGET = 26.5;
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = pl.jaboja.LibraryWidget.LibraryWidgetExtension;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				REGISTER_APP_GROUPS = YES;
+				SKIP_INSTALL = YES;
+				STRING_CATALOG_GENERATE_SYMBOLS = YES;
+				SWIFT_APPROACHABLE_CONCURRENCY = YES;
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_UPCOMING_FEATURE_MEMBER_IMPORT_VISIBILITY = YES;
+				SWIFT_VERSION = 5.0;
+			};
+			name = Debug;
+		};
+		9A434C61301F8D1100757CA8 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				ASSETCATALOG_COMPILER_WIDGET_BACKGROUND_COLOR_NAME = WidgetBackground;
+				CODE_SIGN_ENTITLEMENTS = LibraryWidgetExtensionExtension.entitlements;
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = W9AG2GQTFR;
+				ENABLE_APP_SANDBOX = YES;
+				ENABLE_INCOMING_NETWORK_CONNECTIONS = NO;
+				ENABLE_OUTGOING_NETWORK_CONNECTIONS = YES;
+				ENABLE_RESOURCE_ACCESS_AUDIO_INPUT = NO;
+				ENABLE_RESOURCE_ACCESS_BLUETOOTH = NO;
+				ENABLE_RESOURCE_ACCESS_CALENDARS = NO;
+				ENABLE_RESOURCE_ACCESS_CAMERA = NO;
+				ENABLE_RESOURCE_ACCESS_CONTACTS = NO;
+				ENABLE_RESOURCE_ACCESS_LOCATION = NO;
+				ENABLE_RESOURCE_ACCESS_PRINTING = NO;
+				ENABLE_RESOURCE_ACCESS_USB = NO;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = LibraryWidgetExtension/Info.plist;
+				INFOPLIST_KEY_CFBundleDisplayName = LibraryWidgetExtension;
+				INFOPLIST_KEY_NSHumanReadableCopyright = "";
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/../Frameworks",
+					"@executable_path/../../../../Frameworks",
+				);
+				MACOSX_DEPLOYMENT_TARGET = 26.5;
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = pl.jaboja.LibraryWidget.LibraryWidgetExtension;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				REGISTER_APP_GROUPS = YES;
+				SKIP_INSTALL = YES;
+				STRING_CATALOG_GENERATE_SYMBOLS = YES;
+				SWIFT_APPROACHABLE_CONCURRENCY = YES;
 				SWIFT_EMIT_LOC_STRINGS = YES;
 				SWIFT_UPCOMING_FEATURE_MEMBER_IMPORT_VISIBILITY = YES;
 				SWIFT_VERSION = 5.0;
@@ -320,6 +665,15 @@
 			buildConfigurations = (
 				9A434C11301F89EA00757CA8 /* Debug */,
 				9A434C12301F89EA00757CA8 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		9A434C5F301F8D1100757CA8 /* Build configuration list for PBXNativeTarget "LibraryWidgetExtensionExtension" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				9A434C60301F8D1100757CA8 /* Debug */,
+				9A434C61301F8D1100757CA8 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;

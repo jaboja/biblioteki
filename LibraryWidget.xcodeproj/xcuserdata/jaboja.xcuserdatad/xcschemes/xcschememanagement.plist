@@ -7,7 +7,25 @@
 		<key>LibraryWidget.xcscheme_^#shared#^_</key>
 		<dict>
 			<key>orderHint</key>
+			<integer>1</integer>
+		</dict>
+		<key>LibraryWidgetExtensionExtension.xcscheme_^#shared#^_</key>
+		<dict>
+			<key>orderHint</key>
 			<integer>0</integer>
+		</dict>
+	</dict>
+	<key>SuppressBuildableAutocreation</key>
+	<dict>
+		<key>9A434C04301F89EA00757CA8</key>
+		<dict>
+			<key>primary</key>
+			<true/>
+		</dict>
+		<key>9A434C48301F8D1000757CA8</key>
+		<dict>
+			<key>primary</key>
+			<true/>
 		</dict>
 	</dict>
 </dict>
