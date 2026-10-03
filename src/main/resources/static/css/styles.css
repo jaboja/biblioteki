@@ -110,26 +110,49 @@ tr:hover {
     background-color: #f5f5f5;
 }
 
+#loansTableBody td > b {
+    font-family: monospace;
+    background: #bdf;
+    padding: .2em .6em;
+    border-radius: .5em;
+}
+td h2 {
+    font-size: inherit;
+    margin: 0;
+    padding: 0;
+}
+td h3 {
+    font-size: 80%;
+    margin: 0;
+    padding: 0;
+    font-weight: normal;
+}
+
+.due {
+    white-space: nowrap;
+    font-size: 90%;
+}
+
 .due-soon {
     color: #e74c3c;
     font-weight: 500;
 }
-
 .due-overdue {
     color: #c0392b;
     font-weight: bold;
 }
 
-.renewable {
+.renewable::after {
     color: #27ae60;
+    content: " +";
 }
-
-.not-renewable {
+.not-renewable::after {
     color: #e74c3c;
+    content: " !";
 }
-
-.unknown-renewable {
+.unknown-renewable::after {
     color: #95a5a6;
+    content: " ?";
 }
 
 .loading {

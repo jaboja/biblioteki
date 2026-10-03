@@ -145,7 +145,7 @@
                         </goals>
                         <phase>generate-resources</phase>
                         <configuration>
-                            <arguments>run build</arguments>
+                            <arguments>run build-and-copy</arguments>
                         </configuration>
                     </execution>
                 </executions>

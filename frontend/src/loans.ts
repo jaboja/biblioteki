@@ -112,22 +112,30 @@ export function displayLoans(data: LoansResponse): void {
         }
 
         let renewableClass = 'unknown-renewable';
-        let renewableText = 'Nieznany';
         if (loan.renewable === true) {
             renewableClass = 'renewable';
-            renewableText = 'Tak';
         } else if (loan.renewable === false) {
             renewableClass = 'not-renewable';
-            renewableText = 'Nie';
         }
 
+        let title = loan.title || 'Brak';
+        let i = title.indexOf('/');
+        if (i >= 0) {
+            let subtitle = title.substring(i + 1).trim();
+            title = title.substring(0, i).trim();
+            title = `<h2>${title}</h2><h3>${subtitle}</h3>`;
+        } else {
+            title = `<h2>${title}</h2>`;
+        }
+
+        let location = loan.libraryName || loan.libraryId;
+        location = location ? `<b>${location}</b> ` : '';
+        if (loan.location) location += loan.location;
+
         row.innerHTML = `
-            <td>${loan.libraryName || loan.libraryId || 'Brak'}</td>
-            <td>${loan.title || 'Brak'}</td>
-            <td>${loan.author || 'Brak'}</td>
-            <td class="${dueDateClass}">${dueDateText}</td>
-            <td>${loan.location || 'Brak'}</td>
-            <td class="${renewableClass}">${renewableText}</td>
+            <td class="due ${dueDateClass} ${renewableClass}">${dueDateText}</td>
+            <td>${title}</td>
+            <td>${location || 'Brak'}</td>
         `;
         tbody.appendChild(row);
     });
