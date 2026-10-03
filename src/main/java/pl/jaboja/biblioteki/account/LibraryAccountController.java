@@ -1,7 +1,13 @@
 package pl.jaboja.biblioteki.account;
 
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.Schema;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -13,24 +19,36 @@ import java.util.List;
 @RestController
 @RequestMapping("/api/accounts")
 @RequiredArgsConstructor
+@Tag(name = "Konta biblioteki", description = "Zarządzanie kontami dostępu do bibliotek")
 public class LibraryAccountController {
 
     private final LibraryAccountRepository repo;
 
     // --- DTO ---
 
+    @Schema(description = "Żądanie utworzenia lub aktualizacji konta")
     record AccountRequest(
-        @NotBlank LibraryDefinition library,
+        @Schema(description = "Definicja biblioteki", required = true)
+        @NotNull LibraryDefinition library,
+        @Schema(description = "Nazwa użytkownika", required = true, example = "jan.kowalski")
         @NotBlank String username,
+        @Schema(description = "Hasło", required = true, example = "tajne123")
         @NotBlank String password,
+        @Schema(description = "Czy konto jest aktywne", defaultValue = "true")
         boolean enabled
     ) {}
 
+    @Schema(description = "Odpowiedź z informacjami o koncie")
     record AccountResponse(
+        @Schema(description = "Identyfikator konta", example = "1")
         Long id,
+        @Schema(description = "Identyfikator biblioteki", example = "UW")
         String library,
+        @Schema(description = "Wyświetlana nazwa biblioteki", example = "Biblioteka Uniwersytecka")
         String libraryDisplayName,
+        @Schema(description = "Nazwa użytkownika", example = "jan.kowalski")
         String username,
+        @Schema(description = "Czy konto jest aktywne", example = "true")
         boolean enabled
     ) {
         static AccountResponse from(LibraryAccount a) {
@@ -46,13 +64,27 @@ public class LibraryAccountController {
 
     // --- Endpointy ---
 
-    /** GET /api/accounts – lista wszystkich kont (bez haseł) */
+    @Operation(
+        summary = "Lista wszystkich kont",
+        description = "Zwraca listę wszystkich skonfigurowanych kont dostępu do bibliotek (bez haseł)",
+        responses = {
+            @ApiResponse(responseCode = "200", description = "Lista kont",
+                content = @Content(schema = @Schema(implementation = AccountResponse.class)))
+        }
+    )
     @GetMapping
     public List<AccountResponse> list() {
         return repo.findAll().stream().map(AccountResponse::from).toList();
     }
 
-    /** POST /api/accounts – dodaj konto */
+    @Operation(
+        summary = "Dodaj nowe konto",
+        description = "Tworzy nowe konto dostępu do biblioteki",
+        responses = {
+            @ApiResponse(responseCode = "201", description = "Konto utworzone",
+                content = @Content(schema = @Schema(implementation = AccountResponse.class)))
+        }
+    )
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
     public AccountResponse create(@RequestBody @Valid AccountRequest req) {
@@ -64,7 +96,15 @@ public class LibraryAccountController {
         return AccountResponse.from(repo.save(account));
     }
 
-    /** PATCH /api/accounts/{id} – aktualizuj (np. zmień hasło lub włącz/wyłącz) */
+    @Operation(
+        summary = "Aktualizuj konto",
+        description = "Aktualizuje istniejące konto (można zmienić hasło, nazwę użytkownika lub status aktywności)",
+        responses = {
+            @ApiResponse(responseCode = "200", description = "Konto zaktualizowane",
+                content = @Content(schema = @Schema(implementation = AccountResponse.class))),
+            @ApiResponse(responseCode = "404", description = "Konto nie znalezione")
+        }
+    )
     @PatchMapping("/{id}")
     public AccountResponse update(@PathVariable Long id, @RequestBody AccountRequest req) {
         var account = repo.findById(id)
@@ -75,16 +115,38 @@ public class LibraryAccountController {
         return AccountResponse.from(repo.save(account));
     }
 
-    /** DELETE /api/accounts/{id} */
+    @Operation(
+        summary = "Usuń konto",
+        description = "Usuwa konto o podanym ID",
+        responses = {
+            @ApiResponse(responseCode = "204", description = "Konto usunięte"),
+            @ApiResponse(responseCode = "404", description = "Konto nie znalezione")
+        }
+    )
     @DeleteMapping("/{id}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
     public void delete(@PathVariable Long id) {
         repo.deleteById(id);
     }
 
-    record LibraryResponse(String id, String name, String location) {}
+    @Schema(description = "Informacje o dostępnej bibliotece")
+    record LibraryResponse(
+        @Schema(description = "Identyfikator biblioteki", example = "UW")
+        String id,
+        @Schema(description = "Nazwa biblioteki", example = "Biblioteka Uniwersytecka")
+        String name,
+        @Schema(description = "Lokalizacja biblioteki", example = "Warszawa")
+        String location
+    ) {}
 
-    /** GET /api/libraries – lista dostępnych definicji bibliotek */
+    @Operation(
+        summary = "Lista dostępnych bibliotek",
+        description = "Zwraca listę wszystkich dostępnych definicji bibliotek",
+        responses = {
+            @ApiResponse(responseCode = "200", description = "Lista bibliotek",
+                content = @Content(schema = @Schema(implementation = LibraryResponse.class)))
+        }
+    )
     @GetMapping("/libraries")
     public List<LibraryResponse> libraries() {
         return List.of(LibraryDefinition.values()).stream()

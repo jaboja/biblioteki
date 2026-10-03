@@ -1,6 +1,7 @@
 package pl.jaboja.biblioteki.loans;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
+import io.swagger.v3.oas.annotations.media.Schema;
 
 import java.time.LocalDate;
 
@@ -9,14 +10,23 @@ import java.time.LocalDate;
  * Nie jest encją JPA – dane nie są persystowane (cache in-memory).
  */
 @JsonInclude(JsonInclude.Include.NON_NULL)
+@Schema(description = "Wypożyczenie z biblioteki")
 public record Loan(
+    @Schema(description = "Unikalny identyfikator wypożyczenia")
     String id,
+    @Schema(description = "Identyfikator biblioteki")
     String libraryId,
+    @Schema(description = "Nazwa biblioteki")
     String libraryName,
+    @Schema(description = "Tytuł publikacji")
     String title,
+    @Schema(description = "Autor publikacji")
     String author,
+    @Schema(description = "Data zwrotu", example = "2026-12-31")
     LocalDate dueDate,
+    @Schema(description = "Lokalizacja wypożyczenia")
     String location,
+    @Schema(description = "Czy wypożyczenie można przedłużyć")
     Boolean renewable    // null = nieznany status
 ) implements Comparable<Loan> {
 
