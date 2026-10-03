@@ -1,12 +1,13 @@
 {
   "name": "biblioteki-frontend",
   "version": "1.0.0",
-  "description": "Frontend for Biblioteki application",
+  "description": "Frontend for Biblioteki Spring Boot application",
   "type": "module",
   "scripts": {
     "dev": "vite",
-    "build": "tsc && vite build",
-    "preview": "vite preview"
+    "build": "vite build",
+    "copy": "node build.js",
+    "build-and-copy": "npm run build && npm run copy"
   },
   "dependencies": {
     "typescript": "^5.3.0",
