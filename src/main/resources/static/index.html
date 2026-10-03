@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Biblioteki - Panel Wypożyczeń</title>
+    <link rel="stylesheet" href="/css/styles.css">
+</head>
+<body>
+    <div class="container">
+        <h1>Biblioteki - Panel Wypożyczeń</h1>
+        
+        <div class="controls">
+            <button onclick="loadLoans()">Odśwież Wypożyczenia</button>
+            <button onclick="forceRefresh()">Wymuś Odświeżenie (Wyczyść Cache)</button>
+        </div>
+        
+        <div id="refreshTime" class="refresh-time"></div>
+        
+        <div id="errors" class="error-box" style="display: none;"></div>
+        
+        <div class="stats">
+            <div class="stat-card">
+                <div class="stat-value" id="totalLoans">0</div>
+                <div class="stat-label">Wszystkie Wypożyczenia</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-value" id="overdueLoans">0</div>
+                <div class="stat-label">Przeterminowane</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-value" id="dueSoonLoans">0</div>
+                <div class="stat-label">Wkrótce do zwrotu (3 dni)</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-value" id="renewableLoans">0</div>
+                <div class="stat-label">Do przedłużenia</div>
+            </div>
+        </div>
+        
+        <div class="loans-table">
+            <table>
+                <thead>
+                    <tr>
+                        <th>Biblioteka</th>
+                        <th>Tytuł</th>
+                        <th>Autor</th>
+                        <th>Data Zwrotu</th>
+                        <th>Lokalizacja</th>
+                        <th>Przedłużalny</th>
+                    </tr>
+                </thead>
+                <tbody id="loansTableBody">
+                    <tr>
+                        <td colspan="6" class="loading">Ładowanie wypożyczeń...</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <script src="/js/app.js"></script>
+</body>
+</html>
