@@ -5,7 +5,7 @@ today.setHours(0, 0, 0, 0);
 const threeDaysFromNow = new Date(today);
 threeDaysFromNow.setDate(threeDaysFromNow.getDate() + 3);
 
-export async function loadLoans(): Promise<void> {
+async function loadLoans(): Promise<void> {
     try {
         const response = await fetch('/api/loans');
         if (!response.ok) {
@@ -18,7 +18,7 @@ export async function loadLoans(): Promise<void> {
     }
 }
 
-export async function forceRefreshLoans(): Promise<void> {
+async function forceRefresh(): Promise<void> {
     try {
         const response = await fetch('/api/loans/refresh', {
             method: 'POST'
@@ -102,10 +102,10 @@ export function displayLoans(data: LoansResponse): void {
         
         if (dueDate) {
             const daysDiff = Math.floor((dueDate.getTime() - today.getTime()) / (1000 * 60 * 60 * 24));
-            if (dueDate < today) {
+            if (dueDate < today) { 
                 dueDateClass = 'due-overdue';
                 dueDateText += ` (${Math.abs(daysDiff)} dni po terminie)`;
-            } else if (daysDiff <= 3) {
+            } else if (daysDiff <= 3) { 
                 dueDateClass = 'due-soon';
                 dueDateText += ` (${daysDiff} dni do terminu)`;
             }
@@ -154,7 +154,7 @@ function updateLoansStats(total: number, overdue: number, dueSoon: number, renew
 }
 
 // Error handling functions
-export function showError(message: string): void {
+function showError(message: string): void {
     const errorDiv = document.getElementById('errors');
     if (errorDiv) {
         errorDiv.textContent = message;
@@ -162,14 +162,23 @@ export function showError(message: string): void {
     }
 }
 
-export function hideError(): void {
+function hideError(): void {
     const errorDiv = document.getElementById('errors');
     if (errorDiv) {
         errorDiv.style.display = 'none';
     }
 }
 
+// Attach all functions to window object to survive Vite minification
+(window as any).loadLoans = loadLoans;
+(window as any).forceRefresh = forceRefresh;
+(window as any).displayLoans = displayLoans;
+(window as any).showError = showError;
+(window as any).hideError = hideError;
+
 // Initialize on page load
 if (window.location.pathname.endsWith('/') || window.location.pathname.endsWith('/index.html')) {
     window.addEventListener('DOMContentLoaded', loadLoans);
 }
+
+export {};

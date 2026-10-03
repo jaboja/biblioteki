@@ -1,10 +1,228 @@
-let u=[];async function b(){try{await f();const t=await fetch("/api/accounts");if(!t.ok)throw new Error(`Błąd HTTP! status: ${t.status}`);const e=await t.json();g(e)}catch(t){y("Nie udało się załadować kont: "+t.message)}}async function f(){try{const t=await fetch("/api/accounts/libraries");if(!t.ok)throw new Error(`Błąd HTTP! status: ${t.status}`);u=await t.json(),p()}catch(t){y("Nie udało się załadować listy bibliotek: "+t.message)}}function p(){const t=document.getElementById("librarySelect");t&&(t.innerHTML='<option value="">Wybierz bibliotekę...</option>',u.forEach(e=>{const o=document.createElement("option");o.value=e.id,o.textContent=e.name||e.id,t.appendChild(o)}))}function g(t){const e=new Date().toLocaleString("pl-PL"),o=document.getElementById("refreshTime");o&&(o.textContent=`Ostatnia aktualizacja: ${e}`),E(),localStorage.setItem("currentAccounts",JSON.stringify(t));const r=document.getElementById("accountsTableBody");if(!r)return;if(r.innerHTML="",t.length===0){r.innerHTML='<tr><td colspan="5" style="text-align: center;">Brak kont</td></tr>',c(0,0,0);return}const a=t.length,i=t.filter(n=>n.enabled).length,m=a-i;c(a,i,m),t.forEach(n=>{const s=document.createElement("tr");let d="renewable",l="Aktywne";n.enabled||(d="not-renewable",l="Nieaktywne"),s.innerHTML=`
-            <td>${n.id||"Brak"}</td>
-            <td>${n.libraryDisplayName||n.library||"Brak"}</td>
-            <td>${n.username||"Brak"}</td>
-            <td class="${d}">${l}</td>
+let libraries = [];
+let currentEditId = null;
+async function loadAccounts() {
+  try {
+    await loadLibraries();
+    const response = await fetch("/api/accounts");
+    if (!response.ok) {
+      throw new Error(`Błąd HTTP! status: ${response.status}`);
+    }
+    const data = await response.json();
+    displayAccounts(data);
+  } catch (error) {
+    showError("Nie udało się załadować kont: " + error.message);
+  }
+}
+async function loadLibraries() {
+  try {
+    const response = await fetch("/api/accounts/libraries");
+    if (!response.ok) {
+      throw new Error(`Błąd HTTP! status: ${response.status}`);
+    }
+    libraries = await response.json();
+    updateLibrarySelect();
+  } catch (error) {
+    showError("Nie udało się załadować listy bibliotek: " + error.message);
+  }
+}
+function updateLibrarySelect() {
+  const select = document.getElementById("librarySelect");
+  if (!select) return;
+  select.innerHTML = '<option value="">Wybierz bibliotekę...</option>';
+  libraries.forEach((lib) => {
+    const option = document.createElement("option");
+    option.value = lib.id;
+    option.textContent = lib.name || lib.id;
+    select.appendChild(option);
+  });
+}
+function displayAccounts(accounts) {
+  const refreshTime = (/* @__PURE__ */ new Date()).toLocaleString("pl-PL");
+  const refreshTimeEl = document.getElementById("refreshTime");
+  if (refreshTimeEl) {
+    refreshTimeEl.textContent = `Ostatnia aktualizacja: ${refreshTime}`;
+  }
+  hideError();
+  localStorage.setItem("currentAccounts", JSON.stringify(accounts));
+  const tbody = document.getElementById("accountsTableBody");
+  if (!tbody) return;
+  tbody.innerHTML = "";
+  if (accounts.length === 0) {
+    tbody.innerHTML = '<tr><td colspan="5" style="text-align: center;">Brak kont</td></tr>';
+    updateAccountStats(0, 0, 0);
+    return;
+  }
+  const total = accounts.length;
+  const enabled = accounts.filter((a) => a.enabled).length;
+  const disabled = total - enabled;
+  updateAccountStats(total, enabled, disabled);
+  accounts.forEach((account) => {
+    const row = document.createElement("tr");
+    let statusClass = "renewable";
+    let statusText = "Aktywne";
+    if (!account.enabled) {
+      statusClass = "not-renewable";
+      statusText = "Nieaktywne";
+    }
+    row.innerHTML = `
+            <td>${account.id || "Brak"}</td>
+            <td>${account.libraryDisplayName || account.library || "Brak"}</td>
+            <td>${account.username || "Brak"}</td>
+            <td class="${statusClass}">${statusText}</td>
             <td>
-                <button onclick="editAccount(${n.id})" style="padding: 5px 10px; margin-right: 5px; background-color: #3498db;" title="Edytuj">Edytuj</button>
-                <button onclick="deleteAccount(${n.id})" style="padding: 5px 10px; background-color: #e74c3c;" title="Usuń">Usuń</button>
+                <button onclick="editAccount(${account.id})" style="padding: 5px 10px; margin-right: 5px; background-color: #3498db;" title="Edytuj">Edytuj</button>
+                <button onclick="deleteAccount(${account.id})" style="padding: 5px 10px; background-color: #e74c3c;" title="Usuń">Usuń</button>
             </td>
-        `,r.appendChild(s)})}function c(t,e,o){const r=document.getElementById("totalAccounts"),a=document.getElementById("enabledAccounts"),i=document.getElementById("disabledAccounts");r&&(r.textContent=t.toString()),a&&(a.textContent=e.toString()),i&&(i.textContent=o.toString())}function y(t){const e=document.getElementById("errors");e&&(e.textContent=t,e.style.display="block")}function E(){const t=document.getElementById("errors");t&&(t.style.display="none")}window.location.pathname.includes("accounts")&&window.addEventListener("DOMContentLoaded",b);
+        `;
+    tbody.appendChild(row);
+  });
+}
+function updateAccountStats(total, enabled, disabled) {
+  const totalEl = document.getElementById("totalAccounts");
+  const enabledEl = document.getElementById("enabledAccounts");
+  const disabledEl = document.getElementById("disabledAccounts");
+  if (totalEl) totalEl.textContent = total.toString();
+  if (enabledEl) enabledEl.textContent = enabled.toString();
+  if (disabledEl) disabledEl.textContent = disabled.toString();
+}
+function showAddForm() {
+  currentEditId = null;
+  const formTitle = document.getElementById("formTitle");
+  if (formTitle) formTitle.textContent = "Dodaj Nowe Konto";
+  setFormValues("", "", "", true);
+  showForm();
+}
+function showEditForm(account) {
+  currentEditId = account.id;
+  const formTitle = document.getElementById("formTitle");
+  if (formTitle) formTitle.textContent = "Edytuj Konto";
+  setFormValues(account.library, account.username, "", account.enabled);
+  showForm();
+}
+function setFormValues(library, username, password, enabled) {
+  const librarySelect = document.getElementById("librarySelect");
+  const usernameInput = document.getElementById("usernameInput");
+  const passwordInput = document.getElementById("passwordInput");
+  const enabledInput = document.getElementById("enabledInput");
+  if (librarySelect) librarySelect.value = library;
+  if (usernameInput) usernameInput.value = username;
+  if (passwordInput) passwordInput.value = password;
+  if (enabledInput) enabledInput.checked = enabled;
+}
+function showForm() {
+  const form = document.getElementById("accountForm");
+  if (form) form.style.display = "block";
+}
+function hideForm() {
+  const form = document.getElementById("accountForm");
+  if (form) form.style.display = "none";
+  currentEditId = null;
+}
+async function saveAccount() {
+  const librarySelect = document.getElementById("librarySelect");
+  const usernameInput = document.getElementById("usernameInput");
+  const passwordInput = document.getElementById("passwordInput");
+  const enabledInput = document.getElementById("enabledInput");
+  if (!librarySelect || !usernameInput) {
+    showError("Proszę uzupełnić wszystkie wymagane pola");
+    return;
+  }
+  const library = librarySelect.value;
+  const username = usernameInput.value;
+  const password = (passwordInput == null ? void 0 : passwordInput.value) || "";
+  const enabled = (enabledInput == null ? void 0 : enabledInput.checked) || false;
+  if (!library || !username) {
+    showError("Proszę uzupełnić wszystkie wymagane pola");
+    return;
+  }
+  try {
+    const requestBody = { library, username, password, enabled };
+    let response;
+    if (currentEditId) {
+      response = await fetch(`/api/accounts/${currentEditId}`, {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(requestBody)
+      });
+    } else {
+      response = await fetch("/api/accounts", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(requestBody)
+      });
+    }
+    if (!response.ok) {
+      throw new Error(`Błąd HTTP! status: ${response.status}`);
+    }
+    hideForm();
+    await loadAccounts();
+  } catch (error) {
+    showError("Nie udało się zapisać konta: " + error.message);
+  }
+}
+async function deleteAccount(id) {
+  if (!confirm("Czy na pewno chcesz usunąć to konto?")) {
+    return;
+  }
+  try {
+    const response = await fetch(`/api/accounts/${id}`, {
+      method: "DELETE"
+    });
+    if (!response.ok) {
+      throw new Error(`Błąd HTTP! status: ${response.status}`);
+    }
+    await loadAccounts();
+  } catch (error) {
+    showError("Nie udało się usunąć konta: " + error.message);
+  }
+}
+function editAccount(id) {
+  const accountsJson = localStorage.getItem("currentAccounts");
+  if (!accountsJson) {
+    showError("Nie znaleziono kont do edycji");
+    return;
+  }
+  const accounts = JSON.parse(accountsJson);
+  const account = accounts.find((a) => a.id === id);
+  if (account) {
+    showEditForm({
+      id: account.id,
+      library: account.library,
+      username: account.username,
+      enabled: account.enabled
+    });
+  } else {
+    showError("Nie znaleziono konta do edycji");
+  }
+}
+function showError(message) {
+  const errorDiv = document.getElementById("errors");
+  if (errorDiv) {
+    errorDiv.textContent = message;
+    errorDiv.style.display = "block";
+  }
+}
+function hideError() {
+  const errorDiv = document.getElementById("errors");
+  if (errorDiv) {
+    errorDiv.style.display = "none";
+  }
+}
+window.loadAccounts = loadAccounts;
+window.loadLibraries = loadLibraries;
+window.displayAccounts = displayAccounts;
+window.showAddForm = showAddForm;
+window.showEditForm = showEditForm;
+window.setFormValues = setFormValues;
+window.showForm = showForm;
+window.hideForm = hideForm;
+window.saveAccount = saveAccount;
+window.deleteAccount = deleteAccount;
+window.editAccount = editAccount;
+window.updateLibrarySelect = updateLibrarySelect;
+window.updateAccountStats = updateAccountStats;
+window.showError = showError;
+window.hideError = hideError;
+if (window.location.pathname.includes("accounts")) {
+  window.addEventListener("DOMContentLoaded", loadAccounts);
+}

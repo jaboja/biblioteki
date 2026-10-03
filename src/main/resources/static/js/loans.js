@@ -1,5 +1,145 @@
-const c=new Date;c.setHours(0,0,0,0);const b=new Date(c);b.setDate(b.getDate()+3);async function T(){try{const e=await fetch("/api/loans");if(!e.ok)throw new Error(`Błąd HTTP! status: ${e.status}`);const n=await e.json();B(n)}catch(e){p("Nie udało się załadować wypożyczeń: "+e.message)}}function B(e){const n=new Date(e.fetchedAt).toLocaleString("pl-PL"),f=document.getElementById("refreshTime");f&&(f.textContent=`Ostatnia aktualizacja: ${n}`),e.errors&&e.errors.length>0?p("Wystąpiły błędy: "+e.errors.join(", ")):$();const a=e.loans||[],i=document.getElementById("loansTableBody");if(!i)return;if(i.innerHTML="",a.length===0){i.innerHTML='<tr><td colspan="6" style="text-align: center;">Brak wypożyczeń</td></tr>';return}a.sort((t,o)=>!t.dueDate&&!o.dueDate?0:t.dueDate?o.dueDate?new Date(t.dueDate).getTime()-new Date(o.dueDate).getTime():-1:1);let m=a.length,s=0,d=0,E=0;a.forEach(t=>{if(t.dueDate){const o=new Date(t.dueDate+"T00:00:00");o<c?s++:o<=b&&d++}t.renewable===!0&&E++}),L(m,s,d,E),a.forEach(t=>{const o=document.createElement("tr"),w=t.dueDate?new Date(t.dueDate+"T00:00:00"):null;let y="",h=t.dueDate||"Brak daty";if(w){const u=Math.floor((w.getTime()-c.getTime())/864e5);w<c?(y="due-overdue",h+=` (${Math.abs(u)} dni po terminie)`):u<=3&&(y="due-soon",h+=` (${u} dni do terminu)`)}let D="unknown-renewable";t.renewable===!0?D="renewable":t.renewable===!1&&(D="not-renewable");let r=t.title||"Brak",g=r.indexOf("/");if(g>=0){let u=r.substring(g+1).trim();r=r.substring(0,g).trim(),r=`<h2>${r}</h2><h3>${u}</h3>`}else r=`<h2>${r}</h2>`;let l=t.libraryName||t.libraryId;l=l?`<b>${l}</b> `:"",t.location&&(l+=t.location),o.innerHTML=`
-            <td class="due ${y} ${D}">${h}</td>
-            <td>${r}</td>
-            <td>${l||"Brak"}</td>
-        `,i.appendChild(o)})}function L(e,n,f,a){const i=document.getElementById("totalLoans"),m=document.getElementById("overdueLoans"),s=document.getElementById("dueSoonLoans"),d=document.getElementById("renewableLoans");i&&(i.textContent=e.toString()),m&&(m.textContent=n.toString()),s&&(s.textContent=f.toString()),d&&(d.textContent=a.toString())}function p(e){const n=document.getElementById("errors");n&&(n.textContent=e,n.style.display="block")}function $(){const e=document.getElementById("errors");e&&(e.style.display="none")}(window.location.pathname.endsWith("/")||window.location.pathname.endsWith("/index.html"))&&window.addEventListener("DOMContentLoaded",T);
+const today = /* @__PURE__ */ new Date();
+today.setHours(0, 0, 0, 0);
+const threeDaysFromNow = new Date(today);
+threeDaysFromNow.setDate(threeDaysFromNow.getDate() + 3);
+async function loadLoans() {
+  try {
+    const response = await fetch("/api/loans");
+    if (!response.ok) {
+      throw new Error(`Błąd HTTP! status: ${response.status}`);
+    }
+    const data = await response.json();
+    displayLoans(data);
+  } catch (error) {
+    showError("Nie udało się załadować wypożyczeń: " + error.message);
+  }
+}
+async function forceRefresh() {
+  try {
+    const response = await fetch("/api/loans/refresh", {
+      method: "POST"
+    });
+    if (!response.ok) {
+      throw new Error(`Błąd HTTP! status: ${response.status}`);
+    }
+    const data = await response.json();
+    displayLoans(data);
+  } catch (error) {
+    showError("Nie udało się wymusić odświeżenia: " + error.message);
+  }
+}
+function displayLoans(data) {
+  const refreshTime = new Date(data.fetchedAt).toLocaleString("pl-PL");
+  const refreshTimeEl = document.getElementById("refreshTime");
+  if (refreshTimeEl) {
+    refreshTimeEl.textContent = `Ostatnia aktualizacja: ${refreshTime}`;
+  }
+  if (data.errors && data.errors.length > 0) {
+    showError("Wystąpiły błędy: " + data.errors.join(", "));
+  } else {
+    hideError();
+  }
+  const loans = data.loans || [];
+  const tbody = document.getElementById("loansTableBody");
+  if (!tbody) return;
+  tbody.innerHTML = "";
+  if (loans.length === 0) {
+    tbody.innerHTML = '<tr><td colspan="6" style="text-align: center;">Brak wypożyczeń</td></tr>';
+    return;
+  }
+  loans.sort((a, b) => {
+    if (!a.dueDate && !b.dueDate) return 0;
+    if (!a.dueDate) return 1;
+    if (!b.dueDate) return -1;
+    return new Date(a.dueDate).getTime() - new Date(b.dueDate).getTime();
+  });
+  let total = loans.length;
+  let overdue = 0;
+  let dueSoon = 0;
+  let renewable = 0;
+  loans.forEach((loan) => {
+    if (loan.dueDate) {
+      const dueDate = /* @__PURE__ */ new Date(loan.dueDate + "T00:00:00");
+      if (dueDate < today) {
+        overdue++;
+      } else if (dueDate <= threeDaysFromNow) {
+        dueSoon++;
+      }
+    }
+    if (loan.renewable === true) {
+      renewable++;
+    }
+  });
+  updateLoansStats(total, overdue, dueSoon, renewable);
+  loans.forEach((loan) => {
+    const row = document.createElement("tr");
+    const dueDate = loan.dueDate ? /* @__PURE__ */ new Date(loan.dueDate + "T00:00:00") : null;
+    let dueDateClass = "";
+    let dueDateText = loan.dueDate || "Brak daty";
+    if (dueDate) {
+      const daysDiff = Math.floor((dueDate.getTime() - today.getTime()) / (1e3 * 60 * 60 * 24));
+      if (dueDate < today) {
+        dueDateClass = "due-overdue";
+        dueDateText += ` (${Math.abs(daysDiff)} dni po terminie)`;
+      } else if (daysDiff <= 3) {
+        dueDateClass = "due-soon";
+        dueDateText += ` (${daysDiff} dni do terminu)`;
+      }
+    }
+    let renewableClass = "unknown-renewable";
+    if (loan.renewable === true) {
+      renewableClass = "renewable";
+    } else if (loan.renewable === false) {
+      renewableClass = "not-renewable";
+    }
+    let title = loan.title || "Brak";
+    let i = title.indexOf("/");
+    if (i >= 0) {
+      let subtitle = title.substring(i + 1).trim();
+      title = title.substring(0, i).trim();
+      title = `<h2>${title}</h2><h3>${subtitle}</h3>`;
+    } else {
+      title = `<h2>${title}</h2>`;
+    }
+    let location = loan.libraryName || loan.libraryId;
+    location = location ? `<b>${location}</b> ` : "";
+    if (loan.location) location += loan.location;
+    row.innerHTML = `
+            <td class="due ${dueDateClass} ${renewableClass}">${dueDateText}</td>
+            <td>${title}</td>
+            <td>${location || "Brak"}</td>
+        `;
+    tbody.appendChild(row);
+  });
+}
+function updateLoansStats(total, overdue, dueSoon, renewable) {
+  const totalEl = document.getElementById("totalLoans");
+  const overdueEl = document.getElementById("overdueLoans");
+  const dueSoonEl = document.getElementById("dueSoonLoans");
+  const renewableEl = document.getElementById("renewableLoans");
+  if (totalEl) totalEl.textContent = total.toString();
+  if (overdueEl) overdueEl.textContent = overdue.toString();
+  if (dueSoonEl) dueSoonEl.textContent = dueSoon.toString();
+  if (renewableEl) renewableEl.textContent = renewable.toString();
+}
+function showError(message) {
+  const errorDiv = document.getElementById("errors");
+  if (errorDiv) {
+    errorDiv.textContent = message;
+    errorDiv.style.display = "block";
+  }
+}
+function hideError() {
+  const errorDiv = document.getElementById("errors");
+  if (errorDiv) {
+    errorDiv.style.display = "none";
+  }
+}
+window.loadLoans = loadLoans;
+window.forceRefresh = forceRefresh;
+window.displayLoans = displayLoans;
+window.showError = showError;
+window.hideError = hideError;
+if (window.location.pathname.endsWith("/") || window.location.pathname.endsWith("/index.html")) {
+  window.addEventListener("DOMContentLoaded", loadLoans);
+}

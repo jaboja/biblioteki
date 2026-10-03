@@ -260,6 +260,23 @@ export function hideError(): void {
     }
 }
 
+// Attach all public functions to window object to survive Vite minification
+(window as any).loadAccounts = loadAccounts;
+(window as any).loadLibraries = loadLibraries;
+(window as any).displayAccounts = displayAccounts;
+(window as any).showAddForm = showAddForm;
+(window as any).showEditForm = showEditForm;
+(window as any).setFormValues = setFormValues;
+(window as any).showForm = showForm;
+(window as any).hideForm = hideForm;
+(window as any).saveAccount = saveAccount;
+(window as any).deleteAccount = deleteAccount;
+(window as any).editAccount = editAccount;
+(window as any).updateLibrarySelect = updateLibrarySelect;
+(window as any).updateAccountStats = updateAccountStats;
+(window as any).showError = showError;
+(window as any).hideError = hideError;
+
 // Initialize on page load
 if (window.location.pathname.includes('accounts')) {
     window.addEventListener('DOMContentLoaded', loadAccounts);
