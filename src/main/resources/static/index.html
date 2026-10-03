@@ -3,62 +3,193 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Biblioteki - Panel Wypożyczeń</title>
+    <title>Biblioteki - Panel</title>
     <link rel="stylesheet" href="/css/styles.css">
+    <style>
+        .tab-buttons {
+            display: flex;
+            gap: 5px;
+            margin-bottom: 20px;
+            border-bottom: 1px solid #dee2e6;
+        }
+        
+        .tab-button {
+            padding: 10px 20px;
+            background: transparent;
+            border: none;
+            border-bottom: 3px solid transparent;
+            cursor: pointer;
+            font-size: 16px;
+            color: #666;
+            transition: all 0.2s;
+        }
+        
+        .tab-button:hover {
+            color: #2c3e50;
+            background: #f8f9fa;
+        }
+        
+        .tab-button.active {
+            color: #2c3e50;
+            border-bottom-color: #3498db;
+            font-weight: 600;
+        }
+        
+        .tab-content {
+            display: none;
+        }
+        
+        .tab-content.active {
+            display: block;
+        }
+    </style>
 </head>
 <body>
     <div class="container">
-        <h1>Biblioteki - Panel Wypożyczeń</h1>
+        <h1>Biblioteki - Panel</h1>
         
-        <div class="controls">
-            <button onclick="loadLoans()">Odśwież Wypożyczenia</button>
-            <button onclick="forceRefresh()">Wymuś Odświeżenie (Wyczyść Cache)</button>
+        <div class="tab-buttons">
+            <button class="tab-button active" onclick="switchTab('loans')">Wypożyczenia</button>
+            <button class="tab-button" onclick="switchTab('accounts')">Konta Dostępu</button>
         </div>
         
-        <div id="refreshTime" class="refresh-time"></div>
-        
-        <div id="errors" class="error-box" style="display: none;"></div>
-        
-        <div class="stats">
-            <div class="stat-card">
-                <div class="stat-value" id="totalLoans">0</div>
-                <div class="stat-label">Wszystkie Wypożyczenia</div>
+        <!-- Loans Tab -->
+        <div id="loans-content" class="tab-content active">
+            <div class="controls">
+                <button onclick="loadLoans()">Odśwież Wypożyczenia</button>
+                <button onclick="forceRefresh()">Wymuś Odświeżenie (Wyczyść Cache)</button>
             </div>
-            <div class="stat-card">
-                <div class="stat-value" id="overdueLoans">0</div>
-                <div class="stat-label">Przeterminowane</div>
+            
+            <div id="loans-refresh-time" class="refresh-time"></div>
+            
+            <div id="loans-errors" class="error-box" style="display: none;"></div>
+            
+            <div class="stats">
+                <div class="stat-card">
+                    <div class="stat-value" id="totalLoans">0</div>
+                    <div class="stat-label">Wszystkie Wypożyczenia</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-value" id="overdueLoans">0</div>
+                    <div class="stat-label">Przeterminowane</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-value" id="dueSoonLoans">0</div>
+                    <div class="stat-label">Wkrótce do zwrotu (3 dni)</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-value" id="renewableLoans">0</div>
+                    <div class="stat-label">Do przedłużenia</div>
+                </div>
             </div>
-            <div class="stat-card">
-                <div class="stat-value" id="dueSoonLoans">0</div>
-                <div class="stat-label">Wkrótce do zwrotu (3 dni)</div>
-            </div>
-            <div class="stat-card">
-                <div class="stat-value" id="renewableLoans">0</div>
-                <div class="stat-label">Do przedłużenia</div>
+            
+            <div class="loans-table">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Biblioteka</th>
+                            <th>Tytuł</th>
+                            <th>Autor</th>
+                            <th>Data Zwrotu</th>
+                            <th>Lokalizacja</th>
+                            <th>Przedłużalny</th>
+                        </tr>
+                    </thead>
+                    <tbody id="loansTableBody">
+                        <tr>
+                            <td colspan="6" class="loading">Ładowanie wypożyczeń...</td>
+                        </tr>
+                    </tbody>
+                </table>
             </div>
         </div>
         
-        <div class="loans-table">
-            <table>
-                <thead>
-                    <tr>
-                        <th>Biblioteka</th>
-                        <th>Tytuł</th>
-                        <th>Autor</th>
-                        <th>Data Zwrotu</th>
-                        <th>Lokalizacja</th>
-                        <th>Przedłużalny</th>
-                    </tr>
-                </thead>
-                <tbody id="loansTableBody">
-                    <tr>
-                        <td colspan="6" class="loading">Ładowanie wypożyczeń...</td>
-                    </tr>
-                </tbody>
-            </table>
+        <!-- Accounts Tab -->
+        <div id="accounts-content" class="tab-content">
+            <div class="controls">
+                <button onclick="loadAccounts()">Odśwież Listę Kont</button>
+                <button onclick="showAddForm()">Dodaj Nowe Konto</button>
+            </div>
+            
+            <div id="accounts-refresh-time" class="refresh-time"></div>
+            
+            <div id="accounts-errors" class="error-box" style="display: none;"></div>
+            
+            <div class="stats">
+                <div class="stat-card">
+                    <div class="stat-value" id="totalAccounts">0</div>
+                    <div class="stat-label">Wszystkie Konta</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-value" id="enabledAccounts">0</div>
+                    <div class="stat-label">Aktywne</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-value" id="disabledAccounts">0</div>
+                    <div class="stat-label">Nieaktywne</div>
+                </div>
+            </div>
+            
+            <!-- Account Form -->
+            <div id="accountForm" class="error-box" style="display: none; background-color: #f8f9fa; border: 1px solid #dee2e6; margin-bottom: 20px;">
+                <h3 id="formTitle">Dodaj Nowe Konto</h3>
+                <form id="addAccountForm">
+                    <input type="hidden" id="accountId" />
+                    
+                    <div style="margin-bottom: 15px;">
+                        <label for="librarySelect" style="display: block; margin-bottom: 5px; font-weight: 600;">Biblioteka:</label>
+                        <select id="librarySelect" style="width: 100%; padding: 8px; border: 1px solid #ddd; border-radius: 4px;" required>
+                            <option value="">Ładowanie bibliotek...</option>
+                        </select>
+                    </div>
+                    
+                    <div style="margin-bottom: 15px;">
+                        <label for="usernameInput" style="display: block; margin-bottom: 5px; font-weight: 600;">Nazwa użytkownika:</label>
+                        <input type="text" id="usernameInput" style="width: 100%; padding: 8px; border: 1px solid #ddd; border-radius: 4px;" required />
+                    </div>
+                    
+                    <div style="margin-bottom: 15px;">
+                        <label for="passwordInput" style="display: block; margin-bottom: 5px; font-weight: 600;">Hasło:</label>
+                        <input type="password" id="passwordInput" style="width: 100%; padding: 8px; border: 1px solid #ddd; border-radius: 4px;" />
+                    </div>
+                    
+                    <div style="margin-bottom: 15px;">
+                        <label style="display: flex; align-items: center;">
+                            <input type="checkbox" id="enabledInput" style="margin-right: 10px;" checked />
+                            <span style="font-weight: 600;">Konto aktywne</span>
+                        </label>
+                    </div>
+                    
+                    <div style="display: flex; gap: 10px;">
+                        <button type="button" onclick="saveAccount()" style="background-color: #27ae60;">Zapisz</button>
+                        <button type="button" onclick="hideForm()" style="background-color: #95a5a6;">Anuluj</button>
+                    </div>
+                </form>
+            </div>
+            
+            <div class="loans-table">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>ID</th>
+                            <th>Biblioteka</th>
+                            <th>Nazwa użytkownika</th>
+                            <th>Status</th>
+                            <th>Akcje</th>
+                        </tr>
+                    </thead>
+                    <tbody id="accountsTableBody">
+                        <tr>
+                            <td colspan="5" class="loading">Ładowanie kont...</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
         </div>
     </div>
 
-    <script src="/js/app.js"></script>
+    <!-- Bundle JS - works immediately without build -->
+    <!-- For production with Vite: use <script type="module" src="/src/app.ts"></script> -->
+    <script src="/js/bundle.js"></script>
 </body>
 </html>

@@ -1,17 +1,24 @@
-async function loadLoans() {
+import { Loan, LoansResponse } from './types';
+
+const today = new Date();
+today.setHours(0, 0, 0, 0);
+const threeDaysFromNow = new Date(today);
+threeDaysFromNow.setDate(threeDaysFromNow.getDate() + 3);
+
+export async function loadLoans(): Promise<void> {
     try {
         const response = await fetch('/api/loans');
         if (!response.ok) {
             throw new Error(`Błąd HTTP! status: ${response.status}`);
         }
-        const data = await response.json();
+        const data: LoansResponse = await response.json();
         displayLoans(data);
     } catch (error) {
-        showError('Nie udało się załadować wypożyczeń: ' + error.message);
+        showError('Nie udało się załadować wypożyczeń: ' + (error as Error).message);
     }
 }
 
-async function forceRefresh() {
+export async function forceRefreshLoans(): Promise<void> {
     try {
         const response = await fetch('/api/loans/refresh', {
             method: 'POST'
@@ -19,19 +26,22 @@ async function forceRefresh() {
         if (!response.ok) {
             throw new Error(`Błąd HTTP! status: ${response.status}`);
         }
-        const data = await response.json();
+        const data: LoansResponse = await response.json();
         displayLoans(data);
     } catch (error) {
-        showError('Nie udało się wymusić odświeżenia: ' + error.message);
+        showError('Nie udało się wymusić odświeżenia: ' + (error as Error).message);
     }
 }
 
-function displayLoans(data) {
-    // Aktualizuj czas odświeżenia
+export function displayLoans(data: LoansResponse): void {
+    // Update refresh time
     const refreshTime = new Date(data.fetchedAt).toLocaleString('pl-PL');
-    document.getElementById('refreshTime').textContent = `Ostatnia aktualizacja: ${refreshTime}`;
+    const refreshTimeEl = document.getElementById('refreshTime');
+    if (refreshTimeEl) {
+        refreshTimeEl.textContent = `Ostatnia aktualizacja: ${refreshTime}`;
+    }
 
-    // Wyświetl błędy jeśli wystąpiły
+    // Display errors if any
     if (data.errors && data.errors.length > 0) {
         showError('Wystąpiły błędy: ' + data.errors.join(', '));
     } else {
@@ -41,7 +51,9 @@ function displayLoans(data) {
     const loans = data.loans || [];
     const tbody = document.getElementById('loansTableBody');
     
-    // Wyczyść istniejące wiersze
+    if (!tbody) return;
+    
+    // Clear existing rows
     tbody.innerHTML = '';
     
     if (loans.length === 0) {
@@ -49,24 +61,19 @@ function displayLoans(data) {
         return;
     }
 
-    // Posortuj wypożyczenia według daty zwrotu (najwcześniejsza pierwsza)
-    loans.sort((a, b) => {
+    // Sort loans by due date (soonest first)
+    loans.sort((a: Loan, b: Loan) => {
         if (!a.dueDate && !b.dueDate) return 0;
         if (!a.dueDate) return 1;
         if (!b.dueDate) return -1;
-        return new Date(a.dueDate) - new Date(b.dueDate);
+        return new Date(a.dueDate).getTime() - new Date(b.dueDate).getTime();
     });
 
-    // Oblicz statystyki
+    // Calculate statistics
     let total = loans.length;
     let overdue = 0;
     let dueSoon = 0;
     let renewable = 0;
-
-    const today = new Date();
-    today.setHours(0, 0, 0, 0);
-    const threeDaysFromNow = new Date(today);
-    threeDaysFromNow.setDate(threeDaysFromNow.getDate() + 3);
 
     loans.forEach(loan => {
         if (loan.dueDate) {
@@ -82,13 +89,10 @@ function displayLoans(data) {
         }
     });
 
-    // Aktualizuj statystyki
-    document.getElementById('totalLoans').textContent = total;
-    document.getElementById('overdueLoans').textContent = overdue;
-    document.getElementById('dueSoonLoans').textContent = dueSoon;
-    document.getElementById('renewableLoans').textContent = renewable;
+    // Update statistics
+    updateLoansStats(total, overdue, dueSoon, renewable);
 
-    // Utwórz wiersze tabeli
+    // Create table rows
     loans.forEach(loan => {
         const row = document.createElement('tr');
         
@@ -97,7 +101,7 @@ function displayLoans(data) {
         let dueDateText = loan.dueDate || 'Brak daty';
         
         if (dueDate) {
-            const daysDiff = Math.floor((dueDate - today) / (1000 * 60 * 60 * 24));
+            const daysDiff = Math.floor((dueDate.getTime() - today.getTime()) / (1000 * 60 * 60 * 24));
             if (dueDate < today) {
                 dueDateClass = 'due-overdue';
                 dueDateText += ` (${Math.abs(daysDiff)} dni po terminie)`;
@@ -129,16 +133,35 @@ function displayLoans(data) {
     });
 }
 
-function showError(message) {
-    const errorDiv = document.getElementById('errors');
-    errorDiv.textContent = message;
-    errorDiv.style.display = 'block';
+function updateLoansStats(total: number, overdue: number, dueSoon: number, renewable: number): void {
+    const totalEl = document.getElementById('totalLoans');
+    const overdueEl = document.getElementById('overdueLoans');
+    const dueSoonEl = document.getElementById('dueSoonLoans');
+    const renewableEl = document.getElementById('renewableLoans');
+    
+    if (totalEl) totalEl.textContent = total.toString();
+    if (overdueEl) overdueEl.textContent = overdue.toString();
+    if (dueSoonEl) dueSoonEl.textContent = dueSoon.toString();
+    if (renewableEl) renewableEl.textContent = renewable.toString();
 }
 
-function hideError() {
+// Error handling functions
+export function showError(message: string): void {
     const errorDiv = document.getElementById('errors');
-    errorDiv.style.display = 'none';
+    if (errorDiv) {
+        errorDiv.textContent = message;
+        errorDiv.style.display = 'block';
+    }
 }
 
-// Załaduj wypożyczenia przy ładowaniu strony
-window.addEventListener('DOMContentLoaded', loadLoans);
+export function hideError(): void {
+    const errorDiv = document.getElementById('errors');
+    if (errorDiv) {
+        errorDiv.style.display = 'none';
+    }
+}
+
+// Initialize on page load
+if (window.location.pathname.endsWith('/') || window.location.pathname.endsWith('/index.html')) {
+    window.addEventListener('DOMContentLoaded', loadLoans);
+}
