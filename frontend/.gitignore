@@ -1,0 +1,23 @@
+# Node
+/node
+
+# Dependencies
+node_modules/
+
+# Build output
+.svelte-kit
+/dist
+
+# Logs
+*.log
+npm-debug.log*
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Test
+*.spec.ts
+
+# Vite
+vite.config.ts

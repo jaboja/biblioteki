@@ -11,9 +11,6 @@ import './accounts.ts';
 
 declare global {
     interface Window {
-        // Tab switching
-        switchTab: (tabName: string) => void;
-        
         // Loans functions
         loadLoans: () => Promise<void>;
         forceRefresh: () => Promise<void>;

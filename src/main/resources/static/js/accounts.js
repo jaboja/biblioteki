@@ -154,21 +154,6 @@ function hideError() {
     if (errorDiv) errorDiv.style.display = 'none';
 }
 
-// Tab switching functions
-function switchTab(tabName) {
-    const contents = document.querySelectorAll('.tab-content');
-    const buttons = document.querySelectorAll('.tab-button');
-    
-    contents.forEach(c => c.style.display = 'none');
-    buttons.forEach(b => b.classList.remove('active'));
-    
-    const content = document.getElementById(tabName + '-content');
-    if (content) content.style.display = 'block';
-    
-    const button = document.querySelector(`[onclick="switchTab('${tabName}')"]`);
-    if (button) button.classList.add('active');
-}
-
 // Initialize on page load
 window.addEventListener('DOMContentLoaded', () => {
     const pathname = window.location.pathname;
@@ -186,6 +171,5 @@ window.hideForm = hideForm;
 window.editAccount = editAccount;
 window.deleteAccount = deleteAccount;
 window.saveAccount = saveAccount;
-window.switchTab = switchTab;
 window.showError = showError;
 window.hideError = hideError;
