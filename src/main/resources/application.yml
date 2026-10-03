@@ -1,0 +1,36 @@
+spring:
+  application:
+    name: biblioteki
+
+  datasource:
+    url: jdbc:postgresql://localhost:5432/biblioteki
+    username: biblioteki_user
+    password: biblioteki123;
+
+  h2:
+    console:
+      enabled: true          # dostępna pod /h2-console (tylko dev)
+      path: /h2-console
+
+  jpa:
+    database-platform: org.hibernate.dialect.PostgreSQLDialect
+    hibernate:
+      ddl-auto: update       # tworzy/aktualizuje schemat automatycznie
+    show-sql: false
+    properties:
+      hibernate:
+        format_sql: true
+
+  cache:
+    type: caffeine
+    caffeine:
+      # TTL 10 minut – seria żądań w tym oknie trafia do cache
+      spec: maximumSize=500,expireAfterWrite=10m
+
+server:
+  port: 8080
+
+logging:
+  level:
+    pl.jaboja: DEBUG
+    org.springframework.cache: TRACE   # usuń na produkcji
