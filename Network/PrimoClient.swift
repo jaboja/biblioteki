@@ -47,9 +47,10 @@ actor PrimoClient {
 
     private let session: URLSession
 
-    init(definition: LibraryDefinition) {
+    init(definition: LibraryDefinition) async {
         self.definition = definition
         let config = URLSessionConfiguration.ephemeral
+        let ua: String = await UserAgentStore.shared.userAgent()
         config.httpAdditionalHeaders = [
             "Accept": "application/json, text/plain, */*",
             "Accept-Language": "pl-PL,pl;q=0.9",
@@ -57,7 +58,7 @@ actor PrimoClient {
             "Connection": "keep-alive",
             "Pragma": "no-cache",
             "Priority": "u=3, i",
-            "User-Agent": NetworkConstants.userAgent,
+            "User-Agent": ua,
         ]
         self.session = URLSession(configuration: config, delegate: RedirectCatchingSessionDelegate(), delegateQueue: nil)
     }

@@ -32,7 +32,7 @@ struct LoanFetcher {
             return FetchResult(account: account, loans: [], error: nil)
         }
 
-        let client = PrimoClient(definition: library)
+        let client = await PrimoClient(definition: library)
         do {
             try await client.login(username: account.username, password: password)
             let rawLoans = try await client.fetchLoans(type: .active)

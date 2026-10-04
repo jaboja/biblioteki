@@ -107,7 +107,7 @@ struct AddAccountView: View {
         isValidating = true
         validationError = nil
 
-        let client = PrimoClient(definition: library)
+        let client = await PrimoClient(definition: library)
         do {
             try await client.login(
                 username: username.trimmingCharacters(in: .whitespaces),
@@ -208,7 +208,7 @@ struct EditAccountView: View {
         isValidating = true
         validationError = nil
 
-        let client = PrimoClient(definition: lib)
+        let client = await PrimoClient(definition: lib)
         do {
             try await client.login(
                 username: username.trimmingCharacters(in: .whitespaces),

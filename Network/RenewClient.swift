@@ -23,6 +23,7 @@ actor RenewClient {
             .init(name: "lang", value: "pl"),
         ]
 
+        let ua: String = await UserAgentStore.shared.userAgent()
         var request = URLRequest(url: comps.url!)
         request.httpMethod = "POST"
         request.setValue("Bearer \"\(jwt)\"", forHTTPHeaderField: "Authorization")
@@ -32,7 +33,7 @@ actor RenewClient {
         request.setValue("same-origin", forHTTPHeaderField: "Sec-Fetch-Site")
         request.setValue("cors", forHTTPHeaderField: "Sec-Fetch-Mode")
         request.setValue("follow", forHTTPHeaderField: "Sec-Fetch-Redirect")
-        request.setValue(NetworkConstants.userAgent, forHTTPHeaderField: "User-Agent")
+        request.setValue(ua, forHTTPHeaderField: "User-Agent")
         if definition.isNDE { request.setValue("true", forHTTPHeaderField: "is-nde") }
 
         let body: [String: Any] = ["id": rawID]
