@@ -92,6 +92,7 @@
 			membershipExceptions = (
 				LoanFetcher.swift,
 				PrimoClient.swift,
+				RenewClient.swift,
 			);
 			target = 9A434C04301F89EA00757CA8 /* LibraryWidget */;
 		};
@@ -100,6 +101,7 @@
 			membershipExceptions = (
 				LoanFetcher.swift,
 				PrimoClient.swift,
+				RenewClient.swift,
 			);
 			target = 9A434C48301F8D1000757CA8 /* LibraryWidgetExtensionExtension */;
 		};
