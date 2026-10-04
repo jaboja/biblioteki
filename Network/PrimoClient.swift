@@ -57,7 +57,7 @@ actor PrimoClient {
             "Connection": "keep-alive",
             "Pragma": "no-cache",
             "Priority": "u=3, i",
-            "User-Agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/26.5 Safari/605.1.15",
+            "User-Agent": NetworkConstants.userAgent,
         ]
         self.session = URLSession(configuration: config, delegate: RedirectCatchingSessionDelegate(), delegateQueue: nil)
     }
@@ -65,8 +65,12 @@ actor PrimoClient {
     // MARK: - Logowanie
 
     var isLoggedIn: Bool {
-        guard let jwt, let acquiredAt = jwtAcquiredAt else { return false }
+        guard let acquiredAt = jwtAcquiredAt else { return false }
         return Date().timeIntervalSince(acquiredAt) < jwtTTL
+    }
+
+    var currentJWT: String? {
+        jwt
     }
 
     func login(username: String, password: String) async throws {

@@ -66,7 +66,6 @@
             BuildableIdentifier = "primary"
             BlueprintIdentifier = "9A434C48301F8D1000757CA8"
             BuildableName = "LibraryWidgetExtensionExtension.appex"
-            BlueprintName = "LibraryWidgetExtensionExtension"
             ReferencedContainer = "container:LibraryWidget.xcodeproj">
          </BuildableReference>
       </RemoteRunnable>

@@ -1,8 +1,7 @@
 import Foundation
 
 /// Wysyła żądanie prolongaty jednego wypożyczenia do Primo VE.
-/// Endpoint i parametry wywnioskowane z ruchu sieciowego analogicznie
-/// do fetchLoans – Primo używa POST na /primaws/rest/priv/myaccount/loans/{loanId}/renew
+/// Endpoint i parametry wywnioskowane z ruchu sieciowego – Primo używa POST na /primaws/rest/priv/myaccount/renew_loans
 actor RenewClient {
 
     let definition: LibraryDefinition
@@ -18,22 +17,26 @@ actor RenewClient {
         let rawID = loanID.components(separatedBy: "_").dropFirst().joined(separator: "_")
 
         var comps = URLComponents(string:
-            definition.baseURL + "/primaws/rest/priv/myaccount/loans/\(rawID)/renew"
+            definition.baseURL + "/primaws/rest/priv/myaccount/renew_loans"
         )!
         comps.queryItems = [
             .init(name: "lang", value: "pl"),
-            .init(name: "vid", value: definition.vid),
-            .init(name: "inst_code", value: definition.instCode),
         ]
 
         var request = URLRequest(url: comps.url!)
         request.httpMethod = "POST"
         request.setValue("Bearer \"\(jwt)\"", forHTTPHeaderField: "Authorization")
+        request.setValue("application/json;charset=utf-8", forHTTPHeaderField: "Content-Type")
+        request.setValue("no-cache", forHTTPHeaderField: "Cache-Control")
+        request.setValue("no-cache", forHTTPHeaderField: "Pragma")
         request.setValue("same-origin", forHTTPHeaderField: "Sec-Fetch-Site")
         request.setValue("cors", forHTTPHeaderField: "Sec-Fetch-Mode")
-        request.setValue("empty", forHTTPHeaderField: "Sec-Fetch-Dest")
-        request.setValue("0", forHTTPHeaderField: "Content-Length")
+        request.setValue("follow", forHTTPHeaderField: "Sec-Fetch-Redirect")
+        request.setValue(NetworkConstants.userAgent, forHTTPHeaderField: "User-Agent")
         if definition.isNDE { request.setValue("true", forHTTPHeaderField: "is-nde") }
+
+        let body: [String: Any] = ["id": rawID]
+        request.httpBody = try JSONSerialization.data(withJSONObject: body)
 
         let (_, response) = try await session.data(for: request)
         guard let http = response as? HTTPURLResponse,
