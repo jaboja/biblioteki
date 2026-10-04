@@ -11,20 +11,8 @@ body {
     margin: 0 auto;
 }
 
-h1 {
-    color: #2c3e50;
-    margin-bottom: 20px;
-}
-
-.controls {
-    margin-bottom: 20px;
-    display: flex;
-    gap: 10px;
-    flex-wrap: wrap;
-}
-
 button {
-    padding: 10px 20px;
+    padding: 5px 10px;
     background-color: #3498db;
     color: white;
     border: none;
@@ -165,26 +153,29 @@ td h3 {
     font-size: 14px;
     color: #7f8c8d;
     text-align: right;
-    margin-bottom: 10px;
+    margin: 10px;
 }
 
-@media (max-width: 768px) {
-    th, td {
-        padding: 8px 10px;
-    }
-    .controls {
-        flex-direction: column;
-    }
-    button {
-        width: 100%;
-    }
+.tabs {
+    margin-bottom: 20px;
+    justify-content: space-between;
+    border-bottom: 1px solid #dee2e6;
+}
+
+.controls, .tabs {
+    display: flex;
+    gap: 10px;
+    flex-wrap: wrap;
+}
+
+.controls {
+    height: min-content;
 }
 
 .tab-buttons {
     display: flex;
     gap: 5px;
-    margin-bottom: 20px;
-    border-bottom: 1px solid #dee2e6;
+    flex: 1;
 }
 
 .tab-button {
@@ -215,4 +206,16 @@ td h3 {
 
 .tab-content.active {
     display: block;
+}
+
+@media (max-width: 768px) {
+    th, td {
+        padding: 8px 10px;
+    }
+    .controls, .tabs {
+        flex-direction: column;
+    }
+    button {
+        width: 100%;
+    }
 }

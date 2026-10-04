@@ -63,16 +63,8 @@ export function displayAccounts(accounts: AccountResponse[]): void {
     
     if (accounts.length === 0) {
         tbody.innerHTML = '<tr><td colspan="5" style="text-align: center;">Brak kont</td></tr>';
-        updateAccountStats(0, 0, 0);
         return;
     }
-
-    // Calculate statistics
-    const total = accounts.length;
-    const enabled = accounts.filter(a => a.enabled).length;
-    const disabled = total - enabled;
-
-    updateAccountStats(total, enabled, disabled);
 
     // Create table rows
     accounts.forEach(account => {
@@ -90,23 +82,13 @@ export function displayAccounts(accounts: AccountResponse[]): void {
             <td>${account.libraryDisplayName || account.library || 'Brak'}</td>
             <td>${account.username || 'Brak'}</td>
             <td class="${statusClass}">${statusText}</td>
-            <td>
-                <button onclick="editAccount(${account.id})" style="padding: 5px 10px; margin-right: 5px; background-color: #3498db;" title="Edytuj">Edytuj</button>
-                <button onclick="deleteAccount(${account.id})" style="padding: 5px 10px; background-color: #e74c3c;" title="Usuń">Usuń</button>
+            <td class="actions">
+                <button onclick="editAccount(${account.id})" style="background-color: #3498db" title="Edytuj">Edytuj</button>
+                <button onclick="deleteAccount(${account.id})" style="background-color: #e74c3c" title="Usuń">Usuń</button>
             </td>
         `;
         tbody.appendChild(row);
     });
-}
-
-function updateAccountStats(total: number, enabled: number, disabled: number): void {
-    const totalEl = document.getElementById('totalAccounts');
-    const enabledEl = document.getElementById('enabledAccounts');
-    const disabledEl = document.getElementById('disabledAccounts');
-    
-    if (totalEl) totalEl.textContent = total.toString();
-    if (enabledEl) enabledEl.textContent = enabled.toString();
-    if (disabledEl) disabledEl.textContent = disabled.toString();
 }
 
 export function showAddForm(): void {
@@ -273,7 +255,6 @@ export function hideError(): void {
 (window as any).deleteAccount = deleteAccount;
 (window as any).editAccount = editAccount;
 (window as any).updateLibrarySelect = updateLibrarySelect;
-(window as any).updateAccountStats = updateAccountStats;
 (window as any).showError = showError;
 (window as any).hideError = hideError;
 

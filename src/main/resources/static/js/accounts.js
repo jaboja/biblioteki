@@ -49,13 +49,8 @@ function displayAccounts(accounts) {
   tbody.innerHTML = "";
   if (accounts.length === 0) {
     tbody.innerHTML = '<tr><td colspan="5" style="text-align: center;">Brak kont</td></tr>';
-    updateAccountStats(0, 0, 0);
     return;
   }
-  const total = accounts.length;
-  const enabled = accounts.filter((a) => a.enabled).length;
-  const disabled = total - enabled;
-  updateAccountStats(total, enabled, disabled);
   accounts.forEach((account) => {
     const row = document.createElement("tr");
     let statusClass = "renewable";
@@ -69,21 +64,13 @@ function displayAccounts(accounts) {
             <td>${account.libraryDisplayName || account.library || "Brak"}</td>
             <td>${account.username || "Brak"}</td>
             <td class="${statusClass}">${statusText}</td>
-            <td>
-                <button onclick="editAccount(${account.id})" style="padding: 5px 10px; margin-right: 5px; background-color: #3498db;" title="Edytuj">Edytuj</button>
-                <button onclick="deleteAccount(${account.id})" style="padding: 5px 10px; background-color: #e74c3c;" title="Usuń">Usuń</button>
+            <td class="actions">
+                <button onclick="editAccount(${account.id})" style="background-color: #3498db" title="Edytuj">Edytuj</button>
+                <button onclick="deleteAccount(${account.id})" style="background-color: #e74c3c" title="Usuń">Usuń</button>
             </td>
         `;
     tbody.appendChild(row);
   });
-}
-function updateAccountStats(total, enabled, disabled) {
-  const totalEl = document.getElementById("totalAccounts");
-  const enabledEl = document.getElementById("enabledAccounts");
-  const disabledEl = document.getElementById("disabledAccounts");
-  if (totalEl) totalEl.textContent = total.toString();
-  if (enabledEl) enabledEl.textContent = enabled.toString();
-  if (disabledEl) disabledEl.textContent = disabled.toString();
 }
 function showAddForm() {
   currentEditId = null;
@@ -220,7 +207,6 @@ window.saveAccount = saveAccount;
 window.deleteAccount = deleteAccount;
 window.editAccount = editAccount;
 window.updateLibrarySelect = updateLibrarySelect;
-window.updateAccountStats = updateAccountStats;
 window.showError = showError;
 window.hideError = hideError;
 if (window.location.pathname.includes("accounts")) {

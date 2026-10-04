@@ -53,24 +53,6 @@ function displayLoans(data) {
     if (!b.dueDate) return -1;
     return new Date(a.dueDate).getTime() - new Date(b.dueDate).getTime();
   });
-  let total = loans.length;
-  let overdue = 0;
-  let dueSoon = 0;
-  let renewable = 0;
-  loans.forEach((loan) => {
-    if (loan.dueDate) {
-      const dueDate = /* @__PURE__ */ new Date(loan.dueDate + "T00:00:00");
-      if (dueDate < today) {
-        overdue++;
-      } else if (dueDate <= threeDaysFromNow) {
-        dueSoon++;
-      }
-    }
-    if (loan.renewable === true) {
-      renewable++;
-    }
-  });
-  updateLoansStats(total, overdue, dueSoon, renewable);
   loans.forEach((loan) => {
     const row = document.createElement("tr");
     const dueDate = loan.dueDate ? /* @__PURE__ */ new Date(loan.dueDate + "T00:00:00") : null;
@@ -111,16 +93,6 @@ function displayLoans(data) {
         `;
     tbody.appendChild(row);
   });
-}
-function updateLoansStats(total, overdue, dueSoon, renewable) {
-  const totalEl = document.getElementById("totalLoans");
-  const overdueEl = document.getElementById("overdueLoans");
-  const dueSoonEl = document.getElementById("dueSoonLoans");
-  const renewableEl = document.getElementById("renewableLoans");
-  if (totalEl) totalEl.textContent = total.toString();
-  if (overdueEl) overdueEl.textContent = overdue.toString();
-  if (dueSoonEl) dueSoonEl.textContent = dueSoon.toString();
-  if (renewableEl) renewableEl.textContent = renewable.toString();
 }
 function showError(message) {
   const errorDiv = document.getElementById("errors");

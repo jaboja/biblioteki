@@ -69,29 +69,6 @@ export function displayLoans(data: LoansResponse): void {
         return new Date(a.dueDate).getTime() - new Date(b.dueDate).getTime();
     });
 
-    // Calculate statistics
-    let total = loans.length;
-    let overdue = 0;
-    let dueSoon = 0;
-    let renewable = 0;
-
-    loans.forEach(loan => {
-        if (loan.dueDate) {
-            const dueDate = new Date(loan.dueDate + 'T00:00:00');
-            if (dueDate < today) {
-                overdue++;
-            } else if (dueDate <= threeDaysFromNow) {
-                dueSoon++;
-            }
-        }
-        if (loan.renewable === true) {
-            renewable++;
-        }
-    });
-
-    // Update statistics
-    updateLoansStats(total, overdue, dueSoon, renewable);
-
     // Create table rows
     loans.forEach(loan => {
         const row = document.createElement('tr');
@@ -139,18 +116,6 @@ export function displayLoans(data: LoansResponse): void {
         `;
         tbody.appendChild(row);
     });
-}
-
-function updateLoansStats(total: number, overdue: number, dueSoon: number, renewable: number): void {
-    const totalEl = document.getElementById('totalLoans');
-    const overdueEl = document.getElementById('overdueLoans');
-    const dueSoonEl = document.getElementById('dueSoonLoans');
-    const renewableEl = document.getElementById('renewableLoans');
-    
-    if (totalEl) totalEl.textContent = total.toString();
-    if (overdueEl) overdueEl.textContent = overdue.toString();
-    if (dueSoonEl) dueSoonEl.textContent = dueSoon.toString();
-    if (renewableEl) renewableEl.textContent = renewable.toString();
 }
 
 // Error handling functions

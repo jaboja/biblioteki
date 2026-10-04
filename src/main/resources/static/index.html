@@ -8,41 +8,19 @@
 </head>
 <body>
     <div class="container">
-        <h1>Biblioteki&thinsp;&mdash;&thinsp;Panel</h1>
-
-        <div class="tab-buttons">
-            <a class="tab-button active" href="#">Wypożyczenia</a>
-            <a class="tab-button" href="/accounts.html">Konta Dostępu</a>
-        </div>
-
-        <div id="loans-content" class="tab-content active">
+        <div class="tabs">
+            <div class="tab-buttons">
+                <a class="tab-button active" href="#">Wypożyczenia</a>
+                <a class="tab-button" href="/accounts.html">Konta Dostępu</a>
+            </div>
             <div class="controls">
                 <button onclick="loadLoans()">Odśwież Wypożyczenia</button>
                 <button onclick="forceRefresh()">Wymuś Odświeżenie (Wyczyść Cache)</button>
             </div>
-            
-            <div id="refreshTime" class="refresh-time"></div>
-            
+        </div>
+
+        <div id="loans-content" class="tab-content active">
             <div id="errors" class="error-box" style="display: none;"></div>
-            
-            <div class="stats">
-                <div class="stat-card">
-                    <div class="stat-value" id="totalLoans">0</div>
-                    <div class="stat-label">Wszystkie Wypożyczenia</div>
-                </div>
-                <div class="stat-card">
-                    <div class="stat-value" id="overdueLoans">0</div>
-                    <div class="stat-label">Przeterminowane</div>
-                </div>
-                <div class="stat-card">
-                    <div class="stat-value" id="dueSoonLoans">0</div>
-                    <div class="stat-label">Wkrótce do zwrotu (3 dni)</div>
-                </div>
-                <div class="stat-card">
-                    <div class="stat-value" id="renewableLoans">0</div>
-                    <div class="stat-label">Do przedłużenia</div>
-                </div>
-            </div>
             
             <div class="loans-table">
                 <table>
@@ -60,6 +38,8 @@
                     </tbody>
                 </table>
             </div>
+
+            <div id="refreshTime" class="refresh-time"></div>
         </div>
     </div>
 
