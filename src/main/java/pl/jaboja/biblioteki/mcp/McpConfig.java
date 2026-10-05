@@ -1,7 +1,5 @@
 package pl.jaboja.biblioteki.mcp;
 
-import org.springframework.ai.mcp.annotation.McpTool;
-import org.springframework.ai.mcp.annotation.McpToolParam;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import pl.jaboja.biblioteki.account.LibraryAccountRepository;

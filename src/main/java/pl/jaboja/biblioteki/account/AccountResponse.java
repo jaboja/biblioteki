@@ -1,7 +1,6 @@
 package pl.jaboja.biblioteki.account;
 
 import io.swagger.v3.oas.annotations.media.Schema;
-import pl.jaboja.biblioteki.library.LibraryDefinition;
 
 /**
  * DTO for library account response.

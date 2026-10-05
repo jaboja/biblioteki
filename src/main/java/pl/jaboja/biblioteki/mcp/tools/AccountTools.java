@@ -7,6 +7,7 @@ import pl.jaboja.biblioteki.account.LibraryResponse;
 import pl.jaboja.biblioteki.library.LibraryDefinition;
 
 import java.util.List;
+import java.util.stream.Stream;
 
 /**
  * MCP tools for library account operations.
@@ -48,8 +49,7 @@ public class AccountTools {
         title = "List Libraries"
     )
     public List<LibraryResponse> listLibraries() {
-        return List.of(LibraryDefinition.values())
-            .stream()
+        return Stream.of(LibraryDefinition.values())
             .map(l -> new LibraryResponse(l.name(), l.getDisplayName(), l.getLocation()))
             .toList();
     }

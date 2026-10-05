@@ -27,6 +27,12 @@ spring:
       # TTL 10 minut – seria żądań w tym oknie trafia do cache
       spec: maximumSize=500,expireAfterWrite=10m
 
+  ai:
+    # MCP Server Configuration - STDIO transport
+    mcp:
+      server:
+        stdio: true  # Enable STDIO transport for MCP server
+
 server:
   port: 8080
 
@@ -43,10 +49,3 @@ logging:
   level:
     pl.jaboja: DEBUG
     org.springframework.cache: TRACE   # usuń na produkcji
-
-# MCP Server Configuration - STDIO transport
-spring:
-  ai:
-    mcp:
-      server:
-        stdio: true  # Enable STDIO transport for MCP server

@@ -10,11 +10,11 @@ import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import pl.jaboja.biblioteki.library.LibraryDefinition;
 
 import java.util.List;
+import java.util.stream.Stream;
 
 @RestController
 @RequestMapping("/api/accounts")
@@ -27,12 +27,12 @@ public class LibraryAccountController {
     // --- DTO ---
 
     @Schema(description = "Żądanie utworzenia lub aktualizacji konta")
-    record AccountRequest(
-        @Schema(description = "Definicja biblioteki", required = true)
+    public record AccountRequest(
+        @Schema(description = "Definicja biblioteki", requiredMode = Schema.RequiredMode.REQUIRED)
         @NotNull LibraryDefinition library,
-        @Schema(description = "Nazwa użytkownika", required = true, example = "jan.kowalski")
+        @Schema(description = "Nazwa użytkownika", requiredMode = Schema.RequiredMode.REQUIRED, example = "jan.kowalski")
         @NotBlank String username,
-        @Schema(description = "Hasło", required = true, example = "tajne123")
+        @Schema(description = "Hasło", requiredMode = Schema.RequiredMode.REQUIRED, example = "tajne123")
         @NotBlank String password,
         @Schema(description = "Czy konto jest aktywne", defaultValue = "true")
         boolean enabled
@@ -115,7 +115,7 @@ public class LibraryAccountController {
     )
     @GetMapping("/libraries")
     public List<LibraryResponse> libraries() {
-        return List.of(LibraryDefinition.values()).stream()
+        return Stream.of(LibraryDefinition.values())
             .map(l -> new LibraryResponse(l.name(), l.getDisplayName(), l.getLocation()))
             .toList();
     }
