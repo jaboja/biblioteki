@@ -25,32 +25,37 @@ try {
         cwd: __dirname,
         stdio: 'inherit'
     });
-    
+
     // Step 2: Copy built files to Spring Boot static directory
-    const staticDir = resolve(__dirname, '../src/main/resources/static/js');
+    const staticDir = resolve(__dirname, '../src/main/resources/static');
     const distDir = resolve(__dirname, 'dist');
-    
+    const staticSourceDir = resolve(__dirname, 'static');
+
     // Create static/js directory if it doesn't exist
     if (!existsSync(staticDir)) {
         mkdirSync(staticDir, { recursive: true });
     }
-    
+
     // Copy all JS files from dist to static/js
     const { readdirSync } = await import('fs');
-    const files = readdirSync(distDir);
-    
-    files.forEach(file => {
-        if (file.endsWith('.js')) {
-            const srcPath = resolve(distDir, file);
-            const destPath = resolve(staticDir, file);
-            copyFileSync(srcPath, destPath);
-            console.log(`Copied: ${file} -> ${destPath}`);
-        }
+
+    readdirSync(distDir).forEach(file => {
+        const srcPath = resolve(distDir, file);
+        const destPath = resolve(staticDir, file);
+        copyFileSync(srcPath, destPath);
+        console.log(`Copied: ${file} -> ${destPath}`);
     });
-    
+
+    readdirSync(staticSourceDir).forEach(file => {
+        const srcPath = resolve(staticSourceDir, file);
+        const destPath = resolve(staticDir, file);
+        copyFileSync(srcPath, destPath);
+        console.log(`Copied: ${file} -> ${destPath}`);
+    });
+
     console.log('Build complete!');
     console.log('Files copied to: ' + staticDir);
-    
+
 } catch (error) {
     console.error('Build failed:', error);
     process.exit(1);

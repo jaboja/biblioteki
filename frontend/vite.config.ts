@@ -14,7 +14,6 @@ export default defineConfig({
         loans: resolve(__dirname, 'src/loans.ts'),
         accounts: resolve(__dirname, 'src/accounts.ts'),
         login: resolve(__dirname, 'src/login.ts'),
-        'auth-check': resolve(__dirname, 'src/auth-check.ts'),
       },
       output: {
         entryFileNames: '[name].js',

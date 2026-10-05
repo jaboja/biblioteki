@@ -34,9 +34,6 @@ if (loginForm) {
                 throw new Error('Login failed');
             }
 
-            const data = await response.json();
-            const token = data.token as string;
-
             // Redirect to home
             window.location.href = '/';
 
