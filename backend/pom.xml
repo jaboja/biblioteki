@@ -150,7 +150,7 @@
                 <version>1.13.3</version>
                 <configuration>
                     <nodeVersion>v22.22.1</nodeVersion>
-                    <workingDirectory>frontend</workingDirectory>
+                    <workingDirectory>../frontend</workingDirectory>
                 </configuration>
                 <executions>
                     <execution>
@@ -177,7 +177,7 @@
                         </goals>
                         <phase>generate-resources</phase>
                         <configuration>
-                            <arguments>run build-and-copy</arguments>
+                            <arguments>run build</arguments>
                         </configuration>
                     </execution>
                 </executions>

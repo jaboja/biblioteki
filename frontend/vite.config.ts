@@ -6,7 +6,7 @@ export default defineConfig({
   publicDir: resolve(__dirname, 'static'),
 
   build: {
-    outDir: resolve(__dirname, '../src/main/resources/static'),
+    outDir: resolve(__dirname, '../backend/src/main/resources/static'),
     emptyOutDir: true,
     minify: true,
 
