@@ -3,16 +3,18 @@ import { resolve } from 'path';
 
 export default defineConfig({
   root: resolve(__dirname, '.'),
-  
+
   build: {
     outDir: resolve(__dirname, 'dist'),
     emptyOutDir: true,
     minify: false,
-    
+
     rollupOptions: {
       input: {
         loans: resolve(__dirname, 'src/loans.ts'),
-        accounts: resolve(__dirname, 'src/accounts.ts')
+        accounts: resolve(__dirname, 'src/accounts.ts'),
+        login: resolve(__dirname, 'src/login.ts'),
+        'auth-check': resolve(__dirname, 'src/auth-check.ts'),
       },
       output: {
         entryFileNames: '[name].js',
@@ -20,7 +22,7 @@ export default defineConfig({
       }
     }
   },
-  
+
   server: {
     port: 3000,
     proxy: {

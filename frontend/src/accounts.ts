@@ -1,7 +1,7 @@
-import { AccountRequest, AccountResponse, LibraryDefinition, AccountFormData, AccountStats } from './types';
+import { AccountRequest, AccountResponse, LibraryDefinition, AccountFormData } from './types';
 
 let libraries: LibraryDefinition[] = [];
-let currentEditId: number | null = null;
+let currentEditId: number | null | undefined = null;
 
 export async function loadAccounts(): Promise<void> {
     try {
@@ -155,7 +155,7 @@ export async function saveAccount(): Promise<void> {
 
     try {
         const requestBody: AccountRequest = { library, username, password, enabled };
-        
+
         let response;
         if (currentEditId) {
             response = await fetch(`/api/accounts/${currentEditId}`, {

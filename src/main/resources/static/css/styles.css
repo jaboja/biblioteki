@@ -219,3 +219,50 @@ td h3 {
         width: 100%;
     }
 }
+
+/* Login form styles */
+.login-container {
+    max-width: 400px;
+    margin-top: 50px;
+}
+
+.login-container h2 {
+    margin-bottom: 20px;
+}
+
+.form-group {
+    margin-bottom: 15px;
+}
+
+.form-group:last-of-type {
+    margin-bottom: 20px;
+}
+
+.form-group label {
+    display: block;
+    margin-bottom: 5px;
+    font-weight: 600;
+}
+
+.form-group input {
+    width: 100%;
+    padding: 8px;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+}
+
+.info-box {
+    margin-top: 20px;
+    padding: 15px;
+    background: #f8f9fa;
+    border: 1px solid #dee2e6;
+    color: #666;
+}
+
+.info-box p {
+    margin: 0;
+}
+
+.info-box p + p {
+    margin-top: 5px;
+}

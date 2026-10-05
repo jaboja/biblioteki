@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Biblioteki - Logowanie</title>
+    <link rel="stylesheet" href="/css/styles.css">
+</head>
+<body>
+    <div class="container login-container">
+        <h2>Zaloguj się</h2>
+        
+        <div id="error" class="error-box" style="display: none;">
+            <div class="error-title">Błąd logowania</div>
+            <div>Nieprawidłowa nazwa użytkownika lub hasło</div>
+        </div>
+        
+        <form id="loginForm">
+            <div class="form-group">
+                <label for="username">Nazwa użytkownika:</label>
+                <input type="text" id="username" name="username" required>
+            </div>
+            <div class="form-group">
+                <label for="password">Hasło:</label>
+                <input type="password" id="password" name="password" required>
+            </div>
+            <button type="submit">Zaloguj się</button>
+        </form>
+        
+        <div class="info-box">
+            <p>Default users:</p>
+            <p><strong>admin/admin123</strong> or <strong>user/user123</strong></p>
+        </div>
+    </div>
+    
+    <script src="/js/login.js"></script>
+</body>
+</html>
