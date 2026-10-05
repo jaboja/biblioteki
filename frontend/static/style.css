@@ -156,6 +156,15 @@ td h3 {
     margin: 10px;
 }
 
+.logout-link {
+    color: #e74c3c;
+    text-decoration: none;
+}
+
+.logout-link:hover {
+    text-decoration: underline;
+}
+
 .tabs {
     margin-bottom: 20px;
     justify-content: space-between;

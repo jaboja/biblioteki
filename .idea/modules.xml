@@ -2,7 +2,7 @@
 <project version="4">
   <component name="ProjectModuleManager">
     <modules>
-      <module fileurl="file://$PROJECT_DIR$/.idea/LibraryWidget.iml" filepath="$PROJECT_DIR$/.idea/LibraryWidget.iml" />
+      <module fileurl="file://$PROJECT_DIR$/backend/biblioteki.iml" filepath="$PROJECT_DIR$/backend/biblioteki.iml" />
     </modules>
   </component>
 </project>

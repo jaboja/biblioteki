@@ -1,5 +1,5 @@
 import { AccountRequest, AccountResponse, LibraryDefinition, AccountFormData } from './types';
-import { checkedFetch } from './utils/auth';
+import { checkedFetch, logout } from './utils/auth';
 
 let libraries: LibraryDefinition[] = [];
 let currentEditId: number | null | undefined = null;
@@ -284,6 +284,7 @@ export function initAccountsPage(): void {
     const showAddFormBtn = document.getElementById('showAddFormBtn');
     const saveAccountBtn = document.getElementById('saveAccountBtn');
     const hideFormBtn = document.getElementById('hideFormBtn');
+    const logoutLink = document.getElementById('logoutLink');
 
     if (loadAccountsBtn) {
         loadAccountsBtn.addEventListener('click', loadLoansWrapper);
@@ -299,6 +300,13 @@ export function initAccountsPage(): void {
 
     if (hideFormBtn) {
         hideFormBtn.addEventListener('click', hideForm);
+    }
+
+    if (logoutLink) {
+        logoutLink.addEventListener('click', (e) => {
+            e.preventDefault();
+            logout();
+        });
     }
 
     // Initialize on page load

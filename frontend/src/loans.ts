@@ -1,5 +1,5 @@
 import { Loan, LoansResponse } from './types';
-import { checkedFetch } from './utils/auth';
+import { checkedFetch, logout } from './utils/auth';
 
 const today = new Date();
 today.setHours(0, 0, 0, 0);
@@ -140,6 +140,7 @@ export function initLoansPage(): void {
     // Set up event listeners for buttons
     const loadLoansBtn = document.getElementById('loadLoansBtn');
     const forceRefreshBtn = document.getElementById('forceRefreshBtn');
+    const logoutLink = document.getElementById('logoutLink');
 
     if (loadLoansBtn) {
         loadLoansBtn.addEventListener('click', loadLoans);
@@ -147,6 +148,13 @@ export function initLoansPage(): void {
 
     if (forceRefreshBtn) {
         forceRefreshBtn.addEventListener('click', forceRefresh);
+    }
+
+    if (logoutLink) {
+        logoutLink.addEventListener('click', (e) => {
+            e.preventDefault();
+            logout();
+        });
     }
 
     // Initialize on page load

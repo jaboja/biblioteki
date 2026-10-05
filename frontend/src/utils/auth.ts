@@ -33,6 +33,14 @@ export function redirectToLogin(): void {
 }
 
 /**
+ * Perform logout by clearing token and redirecting to login.
+ */
+export function logout(): void {
+    clearToken();
+    redirectToLogin();
+}
+
+/**
  * Wrapper around fetch that checks for 401/403 and redirects to login.
  * If the response is 401 or 403, it clears the token and redirects.
  */
