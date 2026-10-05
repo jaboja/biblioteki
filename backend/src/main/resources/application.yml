@@ -36,9 +36,11 @@ spring:
     # MCP Server Configuration - HTTPS transport
     mcp:
       server:
-        stdio: false
+        enabled: true
+        protocol: STREAMABLE
         type: ASYNC
-        path: /mcp
+        streamable-http:
+          mcp-endpoint: /mcp
 
 server:
   port: 8080

@@ -1,6 +1,5 @@
 package pl.jaboja.biblioteki.auth;
 
-import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -31,6 +30,8 @@ public class SecurityConfig {
                 .requestMatchers("/", "/login", "/login.html", "/css/**", "/js/**", "/error").permitAll()
                 .requestMatchers("/api-docs/**", "/swagger-ui/**").permitAll()
                 .requestMatchers("/api/auth/login", "/api/auth/refresh", "/api/auth/logout").permitAll()
+                // MCP Server endpoints
+                .requestMatchers("/mcp/**", "/mcp").permitAll()
                 
                 // Secure all API endpoints
                 .requestMatchers("/api/**").authenticated()

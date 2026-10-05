@@ -86,7 +86,7 @@
         <!-- MCP Server Support (Spring AI) - stdio transport -->
         <dependency>
             <groupId>org.springframework.ai</groupId>
-            <artifactId>spring-ai-starter-mcp-server</artifactId>
+            <artifactId>spring-ai-starter-mcp-server-webmvc</artifactId>
             <version>2.0.1</version>
         </dependency>
 
