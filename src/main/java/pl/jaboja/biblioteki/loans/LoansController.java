@@ -47,20 +47,4 @@ public class LoansController {
         var result = loansService.refresh();
         return ResponseEntity.ok(LoansResponse.from(result));
     }
-
-    // --- DTO odpowiedzi ---
-
-    @Schema(description = "Odpowiedź z listą wypożyczeń")
-    record LoansResponse(
-        @Schema(description = "Data pobrania danych", example = "2026-10-03T18:00:00Z")
-        Instant fetchedAt,
-        @Schema(description = "Lista wypożyczeń")
-        List<Loan> loans,
-        @Schema(description = "Lista błędów (pusta jeśli wszystko OK)")
-        List<String> errors
-    ) {
-        static LoansResponse from(LoansService.LoansResult result) {
-            return new LoansResponse(Instant.now(), result.loans(), result.errors());
-        }
-    }
 }

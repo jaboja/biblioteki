@@ -43,3 +43,10 @@ logging:
   level:
     pl.jaboja: DEBUG
     org.springframework.cache: TRACE   # usuń na produkcji
+
+# MCP Server Configuration - STDIO transport
+spring:
+  ai:
+    mcp:
+      server:
+        stdio: true  # Enable STDIO transport for MCP server

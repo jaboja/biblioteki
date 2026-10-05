@@ -38,30 +38,6 @@ public class LibraryAccountController {
         boolean enabled
     ) {}
 
-    @Schema(description = "Odpowiedź z informacjami o koncie")
-    record AccountResponse(
-        @Schema(description = "Identyfikator konta", example = "1")
-        Long id,
-        @Schema(description = "Identyfikator biblioteki", example = "UW")
-        String library,
-        @Schema(description = "Wyświetlana nazwa biblioteki", example = "Biblioteka Uniwersytecka")
-        String libraryDisplayName,
-        @Schema(description = "Nazwa użytkownika", example = "jan.kowalski")
-        String username,
-        @Schema(description = "Czy konto jest aktywne", example = "true")
-        boolean enabled
-    ) {
-        static AccountResponse from(LibraryAccount a) {
-            return new AccountResponse(
-                a.getId(),
-                a.getLibrary().name(),
-                a.getLibrary().getDisplayName(),
-                a.getUsername(),
-                a.isEnabled()
-            );
-        }
-    }
-
     // --- Endpointy ---
 
     @Operation(
@@ -128,16 +104,6 @@ public class LibraryAccountController {
     public void delete(@PathVariable Long id) {
         repo.deleteById(id);
     }
-
-    @Schema(description = "Informacje o dostępnej bibliotece")
-    record LibraryResponse(
-        @Schema(description = "Identyfikator biblioteki", example = "UW")
-        String id,
-        @Schema(description = "Nazwa biblioteki", example = "Biblioteka Uniwersytecka")
-        String name,
-        @Schema(description = "Lokalizacja biblioteki", example = "Warszawa")
-        String location
-    ) {}
 
     @Operation(
         summary = "Lista dostępnych bibliotek",
