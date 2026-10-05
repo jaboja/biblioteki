@@ -2,10 +2,12 @@
  * Login page functionality
  */
 
-const loginForm = document.getElementById('loginForm') as HTMLFormElement | null;
-const errorEl = document.getElementById('error') as HTMLElement | null;
+export function initLoginPage(): void {
+    const loginForm = document.getElementById('loginForm') as HTMLFormElement | null;
+    const errorEl = document.getElementById('error') as HTMLElement | null;
 
-if (loginForm) {
+    if (!loginForm) return;
+
     loginForm.addEventListener('submit', async (e: Event) => {
         e.preventDefault();
 
@@ -43,4 +45,9 @@ if (loginForm) {
             }
         }
     });
+}
+
+// Auto-initialize if this module is loaded on the login page
+if (window.location.pathname.endsWith('/login.html') || window.location.pathname.endsWith('/login')) {
+    document.addEventListener('DOMContentLoaded', initLoginPage);
 }

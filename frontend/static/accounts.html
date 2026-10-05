@@ -14,8 +14,8 @@
                 <a class="tab-button active" href="#">Konta Dostępu</a>
             </div>
             <div class="controls">
-                <button onclick="loadAccounts()">Odśwież Listę Kont</button>
-                <button onclick="showAddForm()">Dodaj Nowe Konto</button>
+                <button id="loadAccountsBtn">Odśwież Listę Kont</button>
+                <button id="showAddFormBtn">Dodaj Nowe Konto</button>
             </div>
         </div>
         
@@ -53,8 +53,8 @@
                     </div>
                     
                     <div style="display: flex; gap: 10px;">
-                        <button type="button" onclick="saveAccount()" style="background-color: #27ae60;">Zapisz</button>
-                        <button type="button" onclick="hideForm()" style="background-color: #95a5a6;">Anuluj</button>
+                        <button type="button" id="saveAccountBtn" style="background-color: #27ae60;">Zapisz</button>
+                        <button type="button" id="hideFormBtn" style="background-color: #95a5a6;">Anuluj</button>
                     </div>
                 </form>
             </div>
@@ -82,6 +82,6 @@
         </div>
     </div>
 
-    <script src="/accounts.js"></script>
+    <script type="module" src="/accounts.js"></script>
 </body>
 </html>

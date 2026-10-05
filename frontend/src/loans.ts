@@ -1,13 +1,12 @@
 import { Loan, LoansResponse } from './types';
+import { checkedFetch } from './utils/auth';
 
 const today = new Date();
 today.setHours(0, 0, 0, 0);
-const threeDaysFromNow = new Date(today);
-threeDaysFromNow.setDate(threeDaysFromNow.getDate() + 3);
 
 async function loadLoans(): Promise<void> {
     try {
-        const response = await fetch('/api/loans');
+        const response = await checkedFetch('/api/loans');
         if (!response.ok) {
             throw new Error(`Błąd HTTP! status: ${response.status}`);
         }
@@ -20,7 +19,7 @@ async function loadLoans(): Promise<void> {
 
 async function forceRefresh(): Promise<void> {
     try {
-        const response = await fetch('/api/loans/refresh', {
+        const response = await checkedFetch('/api/loans/refresh', {
             method: 'POST'
         });
         if (!response.ok) {
@@ -34,6 +33,9 @@ async function forceRefresh(): Promise<void> {
 }
 
 export function displayLoans(data: LoansResponse): void {
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+
     // Update refresh time
     const refreshTime = new Date(data.fetchedAt).toLocaleString('pl-PL');
     const refreshTimeEl = document.getElementById('refreshTime');
@@ -119,7 +121,7 @@ export function displayLoans(data: LoansResponse): void {
 }
 
 // Error handling functions
-function showError(message: string): void {
+export function showError(message: string): void {
     const errorDiv = document.getElementById('errors');
     if (errorDiv) {
         errorDiv.textContent = message;
@@ -127,23 +129,33 @@ function showError(message: string): void {
     }
 }
 
-function hideError(): void {
+export function hideError(): void {
     const errorDiv = document.getElementById('errors');
     if (errorDiv) {
         errorDiv.style.display = 'none';
     }
 }
 
-// Attach all functions to window object to survive Vite minification
-(window as any).loadLoans = loadLoans;
-(window as any).forceRefresh = forceRefresh;
-(window as any).displayLoans = displayLoans;
-(window as any).showError = showError;
-(window as any).hideError = hideError;
+export function initLoansPage(): void {
+    // Set up event listeners for buttons
+    const loadLoansBtn = document.getElementById('loadLoansBtn');
+    const forceRefreshBtn = document.getElementById('forceRefreshBtn');
 
-// Initialize on page load
-if (window.location.pathname.endsWith('/') || window.location.pathname.endsWith('/index.html')) {
-    window.addEventListener('DOMContentLoaded', loadLoans);
+    if (loadLoansBtn) {
+        loadLoansBtn.addEventListener('click', loadLoans);
+    }
+
+    if (forceRefreshBtn) {
+        forceRefreshBtn.addEventListener('click', forceRefresh);
+    }
+
+    // Initialize on page load
+    loadLoans();
 }
 
-export {};
+// Auto-initialize if this module is loaded on the loans page
+if (window.location.pathname.endsWith('/') || window.location.pathname.endsWith('/index.html')) {
+    document.addEventListener('DOMContentLoaded', initLoansPage);
+}
+
+export { loadLoans, forceRefresh };

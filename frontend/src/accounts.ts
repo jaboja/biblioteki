@@ -1,12 +1,21 @@
 import { AccountRequest, AccountResponse, LibraryDefinition, AccountFormData } from './types';
+import { checkedFetch } from './utils/auth';
 
 let libraries: LibraryDefinition[] = [];
 let currentEditId: number | null | undefined = null;
 
-export async function loadAccounts(): Promise<void> {
+async function loadLoansWrapper(): Promise<void> {
     try {
         await loadLibraries();
-        const response = await fetch('/api/accounts');
+        await loadAccounts();
+    } catch (error) {
+        showError('Nie udało się załadować danych: ' + (error as Error).message);
+    }
+}
+
+async function loadAccounts(): Promise<void> {
+    try {
+        const response = await checkedFetch('/api/accounts');
         if (!response.ok) {
             throw new Error(`Błąd HTTP! status: ${response.status}`);
         }
@@ -17,9 +26,9 @@ export async function loadAccounts(): Promise<void> {
     }
 }
 
-export async function loadLibraries(): Promise<void> {
+async function loadLibraries(): Promise<void> {
     try {
-        const response = await fetch('/api/accounts/libraries');
+        const response = await checkedFetch('/api/accounts/libraries');
         if (!response.ok) {
             throw new Error(`Błąd HTTP! status: ${response.status}`);
         }
@@ -83,11 +92,38 @@ export function displayAccounts(accounts: AccountResponse[]): void {
             <td>${account.username || 'Brak'}</td>
             <td class="${statusClass}">${statusText}</td>
             <td class="actions">
-                <button onclick="editAccount(${account.id})" style="background-color: #3498db" title="Edytuj">Edytuj</button>
-                <button onclick="deleteAccount(${account.id})" style="background-color: #e74c3c" title="Usuń">Usuń</button>
+                <button class="edit-btn" data-id="${account.id}" style="background-color: #3498db" title="Edytuj">Edytuj</button>
+                <button class="delete-btn" data-id="${account.id}" style="background-color: #e74c3c" title="Usuń">Usuń</button>
             </td>
         `;
         tbody.appendChild(row);
+    });
+
+    // Add event listeners to action buttons
+    setupActionButtons();
+}
+
+function setupActionButtons(): void {
+    // Edit buttons
+    document.querySelectorAll('.edit-btn').forEach(btn => {
+        btn.addEventListener('click', (e) => {
+            const target = e.target as HTMLElement;
+            const id = parseInt(target.dataset.id || '0');
+            if (!isNaN(id)) {
+                editAccount(id);
+            }
+        });
+    });
+
+    // Delete buttons
+    document.querySelectorAll('.delete-btn').forEach(btn => {
+        btn.addEventListener('click', (e) => {
+            const target = e.target as HTMLElement;
+            const id = parseInt(target.dataset.id || '0');
+            if (!isNaN(id)) {
+                deleteAccountWrapper(id);
+            }
+        });
     });
 }
 
@@ -132,7 +168,7 @@ export function hideForm(): void {
     currentEditId = null;
 }
 
-export async function saveAccount(): Promise<void> {
+async function saveAccountWrapper(): Promise<void> {
     const librarySelect = document.getElementById('librarySelect') as HTMLSelectElement | null;
     const usernameInput = document.getElementById('usernameInput') as HTMLInputElement | null;
     const passwordInput = document.getElementById('passwordInput') as HTMLInputElement | null;
@@ -158,13 +194,13 @@ export async function saveAccount(): Promise<void> {
 
         let response;
         if (currentEditId) {
-            response = await fetch(`/api/accounts/${currentEditId}`, {
+            response = await checkedFetch(`/api/accounts/${currentEditId}`, {
                 method: 'PATCH',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify(requestBody)
             });
         } else {
-            response = await fetch('/api/accounts', {
+            response = await checkedFetch('/api/accounts', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify(requestBody)
@@ -183,13 +219,13 @@ export async function saveAccount(): Promise<void> {
     }
 }
 
-export async function deleteAccount(id: number): Promise<void> {
+async function deleteAccountWrapper(id: number): Promise<void> {
     if (!confirm('Czy na pewno chcesz usunąć to konto?')) {
         return;
     }
 
     try {
-        const response = await fetch(`/api/accounts/${id}`, {
+        const response = await checkedFetch(`/api/accounts/${id}`, {
             method: 'DELETE'
         });
 
@@ -226,7 +262,7 @@ export function editAccount(id: number): void {
     }
 }
 
-// Reuse error functions from loans module
+// Reuse error functions
 export function showError(message: string): void {
     const errorDiv = document.getElementById('errors');
     if (errorDiv) {
@@ -242,23 +278,34 @@ export function hideError(): void {
     }
 }
 
-// Attach all public functions to window object to survive Vite minification
-(window as any).loadAccounts = loadAccounts;
-(window as any).loadLibraries = loadLibraries;
-(window as any).displayAccounts = displayAccounts;
-(window as any).showAddForm = showAddForm;
-(window as any).showEditForm = showEditForm;
-(window as any).setFormValues = setFormValues;
-(window as any).showForm = showForm;
-(window as any).hideForm = hideForm;
-(window as any).saveAccount = saveAccount;
-(window as any).deleteAccount = deleteAccount;
-(window as any).editAccount = editAccount;
-(window as any).updateLibrarySelect = updateLibrarySelect;
-(window as any).showError = showError;
-(window as any).hideError = hideError;
+export function initAccountsPage(): void {
+    // Set up event listeners for buttons
+    const loadAccountsBtn = document.getElementById('loadAccountsBtn');
+    const showAddFormBtn = document.getElementById('showAddFormBtn');
+    const saveAccountBtn = document.getElementById('saveAccountBtn');
+    const hideFormBtn = document.getElementById('hideFormBtn');
 
-// Initialize on page load
-if (window.location.pathname.includes('accounts')) {
-    window.addEventListener('DOMContentLoaded', loadAccounts);
+    if (loadAccountsBtn) {
+        loadAccountsBtn.addEventListener('click', loadLoansWrapper);
+    }
+
+    if (showAddFormBtn) {
+        showAddFormBtn.addEventListener('click', showAddForm);
+    }
+
+    if (saveAccountBtn) {
+        saveAccountBtn.addEventListener('click', saveAccountWrapper);
+    }
+
+    if (hideFormBtn) {
+        hideFormBtn.addEventListener('click', hideForm);
+    }
+
+    // Initialize on page load
+    loadLoansWrapper();
+}
+
+// Auto-initialize if this module is loaded on the accounts page
+if (window.location.pathname.endsWith('/accounts.html') || window.location.pathname.includes('/accounts')) {
+    document.addEventListener('DOMContentLoaded', initAccountsPage);
 }

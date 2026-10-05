@@ -14,8 +14,8 @@
                 <a class="tab-button" href="/accounts.html">Konta Dostępu</a>
             </div>
             <div class="controls">
-                <button onclick="loadLoans()">Odśwież Wypożyczenia</button>
-                <button onclick="forceRefresh()">Wymuś Odświeżenie (Wyczyść Cache)</button>
+                <button id="loadLoansBtn">Odśwież Wypożyczenia</button>
+                <button id="forceRefreshBtn">Wymuś Odświeżenie (Wyczyść Cache)</button>
             </div>
         </div>
 
@@ -43,6 +43,6 @@
         </div>
     </div>
 
-    <script src="/loans.js"></script>
+    <script type="module" src="/loans.js"></script>
 </body>
 </html>
