@@ -3,11 +3,12 @@ import { resolve } from 'path';
 
 export default defineConfig({
   root: resolve(__dirname, '.'),
+  publicDir: resolve(__dirname, 'static'),
 
   build: {
-    outDir: resolve(__dirname, 'dist'),
+    outDir: resolve(__dirname, '../src/main/resources/static'),
     emptyOutDir: true,
-    minify: false,
+    minify: true,
 
     rollupOptions: {
       input: {
