@@ -8,6 +8,7 @@ import org.springframework.stereotype.Service;
 import pl.jaboja.biblioteki.account.LibraryAccount;
 import pl.jaboja.biblioteki.account.LibraryAccountRepository;
 import pl.jaboja.biblioteki.config.CacheConfig;
+import pl.jaboja.biblioteki.library.LibraryDefinition;
 import pl.jaboja.biblioteki.primo.PrimoAuthService;
 import pl.jaboja.biblioteki.primo.PrimoException;
 import pl.jaboja.biblioteki.primo.PrimoLoansService;
@@ -76,6 +77,48 @@ public class LoansService {
     public LoansResult refresh() {
         log.info("Cache evicted – refreshing loans");
         return fetchAll();
+    }
+
+    /**
+     * Procesuje prolongatę pojedynczego wypożyczenia.
+     * Znajduje konto powiązane z daną biblioteką i wykonuje renew.
+     * 
+     * @param loanId ID wypożyczenia w formacie "LIBRARYID_rawLoanId"
+     * @throws PrimoException gdy prolongata się nie powiedzie
+     */
+    public void renewLoan(String loanId) {
+        // Wyodrębnij libraryId z loanId (format: "LIBRARYID_rawLoanId")
+        String libraryId = loanId.contains("_") ? 
+            loanId.substring(0, loanId.indexOf("_")) : loanId;
+        
+        // Zamień libraryId string na LibraryDefinition enum
+        LibraryDefinition library = null;
+        try {
+            library = LibraryDefinition.valueOf(libraryId);
+        } catch (IllegalArgumentException e) {
+            throw new PrimoException("Unknown library: " + libraryId);
+        }
+        
+        // Znajdź aktywne konto dla tej biblioteki
+        List<LibraryAccount> accounts = accountRepo.findByLibraryAndEnabledTrue(library);
+        if (accounts.isEmpty()) {
+            throw new PrimoException("No active account found for library: " + libraryId);
+        }
+        
+        // Użyj pierwszego aktywnego konta dla tej biblioteki
+        LibraryAccount account = accounts.get(0);
+        
+        try {
+            var session = authService.login(
+                account.getLibrary(), account.getUsername(), account.getPassword());
+            loansService.renewLoan(session, loanId);
+            // Po pomyślnej prolongacie odśwież cache
+            refresh();
+            log.info("Successfully renewed loan {} using account {}", loanId, account.getUsername());
+        } catch (PrimoException e) {
+            log.error("Failed to renew loan {}: {}", loanId, e.getMessage());
+            throw e;
+        }
     }
 
     // --- Prywatne ---

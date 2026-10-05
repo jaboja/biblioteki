@@ -8,6 +8,7 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -46,5 +47,21 @@ public class LoansController {
     public ResponseEntity<LoansResponse> refresh() {
         var result = loansService.refresh();
         return ResponseEntity.ok(LoansResponse.from(result));
+    }
+
+    @Operation(
+        summary = "Przedłuż wypożyczenie",
+        description = "Przetwarza prolongatę pojedynczego wypożyczenia. Wymaga ID wypożyczenia w formacie 'LIBRARYID_rawLoanId'",
+        responses = {
+            @ApiResponse(responseCode = "200", description = "Prolongata udana"),
+            @ApiResponse(responseCode = "400", description = "Błędny format ID wypożyczenia"),
+            @ApiResponse(responseCode = "404", description = "Nie znaleziono konta dla biblioteki"),
+            @ApiResponse(responseCode = "500", description = "Błąd serwera biblioteki")
+        }
+    )
+    @PostMapping("/{loanId}/renew")
+    public ResponseEntity<String> renewLoan(@PathVariable String loanId) {
+        loansService.renewLoan(loanId);
+        return ResponseEntity.ok("Loan " + loanId + " renewed successfully");
     }
 }

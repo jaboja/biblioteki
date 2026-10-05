@@ -32,6 +32,22 @@ async function forceRefresh(): Promise<void> {
     }
 }
 
+async function renewLoan(loanId: string): Promise<void> {
+    try {
+        const response = await checkedFetch(`/api/loans/${encodeURIComponent(loanId)}/renew`, {
+            method: 'POST'
+        });
+        if (!response.ok) {
+            throw new Error(`Błąd HTTP! status: ${response.status}`);
+        }
+        showError('Prolongata udana!');
+        // Odśwież listę wypożyczeń po pomyślnej prolongacie
+        await loadLoans();
+    } catch (error) {
+        showError('Nie udało się przedłużyć wypożyczenia: ' + (error as Error).message);
+    }
+}
+
 export function displayLoans(data: LoansResponse): void {
     const today = new Date();
     today.setHours(0, 0, 0, 0);
@@ -59,7 +75,7 @@ export function displayLoans(data: LoansResponse): void {
     tbody.innerHTML = '';
     
     if (loans.length === 0) {
-        tbody.innerHTML = '<tr><td colspan="6" style="text-align: center;">Brak wypożyczeń</td></tr>';
+        tbody.innerHTML = '<tr><td colspan="4" style="text-align: center;">Brak wypożyczeń</td></tr>';
         return;
     }
 
@@ -111,10 +127,16 @@ export function displayLoans(data: LoansResponse): void {
         location = location ? `<b>${location}</b> ` : '';
         if (loan.location) location += loan.location;
 
+        let renewButton = '';
+        if (loan.renewable === true) {
+            renewButton = `<button class="renew-btn" data-loan-id="${loan.id}" title="Przedłuż">Przedłuż</button>`;
+        }
+
         row.innerHTML = `
             <td class="due ${dueDateClass} ${renewableClass}">${dueDateText}</td>
             <td>${title}</td>
             <td>${location || 'Brak'}</td>
+            <td class="actions">${renewButton}</td>
         `;
         tbody.appendChild(row);
     });
@@ -157,6 +179,20 @@ export function initLoansPage(): void {
         });
     }
 
+    // Set up event listeners for renew buttons (using event delegation)
+    const loansTableBody = document.getElementById('loansTableBody');
+    if (loansTableBody) {
+        loansTableBody.addEventListener('click', (e) => {
+            const target = e.target as HTMLElement;
+            if (target.classList.contains('renew-btn')) {
+                const loanId = target.dataset.loanId;
+                if (loanId) {
+                    renewLoan(loanId);
+                }
+            }
+        });
+    }
+
     // Initialize on page load
     loadLoans();
 }
@@ -166,4 +202,4 @@ if (window.location.pathname.endsWith('/') || window.location.pathname.endsWith(
     document.addEventListener('DOMContentLoaded', initLoansPage);
 }
 
-export { loadLoans, forceRefresh };
+export { loadLoans, forceRefresh, renewLoan };

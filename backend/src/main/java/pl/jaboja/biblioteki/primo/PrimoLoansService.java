@@ -92,6 +92,57 @@ public class PrimoLoansService {
         }
     }
 
+    /**
+     * Przetwarza prolongatę pojedynczego wypożyczenia.
+     * Loan ID ma format "LIBRARYID_rawLoanId" – wyodrębniamy rawLoanId.
+     */
+    public void renewLoan(PrimoSession session, String loanId) {
+        var lib = session.library();
+        
+        // loanID ma postać "LIBRARYID_rawLoanId" – wyodrębnij rawLoanId
+        String rawId = loanId.contains("_") ? 
+            loanId.substring(loanId.indexOf("_") + 1) : loanId;
+
+        var url = lib.getBaseUrl()
+            + "/primaws/rest/priv/myaccount/renew_loans"
+            + "?lang=pl";
+
+        try {
+            var reqBuilder = HttpRequest.newBuilder(URI.create(url))
+                .POST(HttpRequest.BodyPublishers.ofString("{\"id\":\"" + rawId + "\"}"))
+                .header("Authorization",    "Bearer \"" + session.jwt() + "\"")
+                .header("Content-Type",     "application/json;charset=utf-8")
+                .header("Accept",           "application/json, text/plain, */*")
+                .header("Accept-Language",  "pl-PL,pl;q=0.9")
+                .header("User-Agent",       USER_AGENT)
+                .header("Sec-Fetch-Site",   "same-origin")
+                .header("Sec-Fetch-Mode",   "cors")
+                .header("Sec-Fetch-Dest",   "empty")
+                .timeout(Duration.ofSeconds(15));
+            
+            if (lib.isNde()) {
+                reqBuilder.header("is-nde", "true");
+            }
+
+            var resp = session.client().send(reqBuilder.build(),
+                HttpResponse.BodyHandlers.ofString(StandardCharsets.UTF_8));
+
+            if (resp.statusCode() == 401) {
+                throw new PrimoException("JWT expired (401) for " + lib.name());
+            }
+            if (resp.statusCode() < 200 || resp.statusCode() >= 300) {
+                throw new PrimoException("renewLoan HTTP " + resp.statusCode() + " for " + lib.name());
+            }
+
+            log.info("Successfully renewed loan {} for {}", rawId, lib.name());
+
+        } catch (PrimoException e) {
+            throw e;
+        } catch (Exception e) {
+            throw new PrimoException("renewLoan failed for " + lib.name() + ": " + e.getMessage(), e);
+        }
+    }
+
     // --- Parsowanie ---
 
     private java.util.Optional<Loan> parseLoan(

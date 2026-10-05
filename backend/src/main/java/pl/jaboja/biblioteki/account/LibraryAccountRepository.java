@@ -10,5 +10,7 @@ public interface LibraryAccountRepository extends JpaRepository<LibraryAccount, 
 
     List<LibraryAccount> findByEnabledTrue();
 
+    List<LibraryAccount> findByLibraryAndEnabledTrue(LibraryDefinition library);
+
     Optional<LibraryAccount> findByLibraryAndUsername(LibraryDefinition library, String username);
 }

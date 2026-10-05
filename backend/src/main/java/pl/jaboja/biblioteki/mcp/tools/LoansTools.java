@@ -43,4 +43,18 @@ public class LoansTools {
         var result = loansService.refresh();
         return LoansResponse.from(result);
     }
+
+    /**
+     * Renews a single loan.
+     * This is the same as POST /api/loans/{loanId}/renew.
+     */
+    @McpTool(
+        name = "renew_loan",
+        description = "Przetwarza prolongatę pojedynczego wypożyczenia. Wymaga ID wypożyczenia w formacie 'LIBRARYID_rawLoanId' (np. 'MBP_12345').",
+        title = "Renew Loan"
+    )
+    public String renewLoan(String loanId) {
+        loansService.renewLoan(loanId);
+        return "Loan " + loanId + " renewed successfully";
+    }
 }
