@@ -9,9 +9,10 @@ import pl.jaboja.biblioteki.account.LibraryAccount;
 import pl.jaboja.biblioteki.account.LibraryAccountRepository;
 import pl.jaboja.biblioteki.config.CacheConfig;
 import pl.jaboja.biblioteki.library.LibraryDefinition;
-import pl.jaboja.biblioteki.primo.PrimoAuthService;
-import pl.jaboja.biblioteki.primo.PrimoException;
-import pl.jaboja.biblioteki.primo.PrimoLoansService;
+import pl.jaboja.biblioteki.library.LibrarySession;
+import pl.jaboja.biblioteki.library.LibrarySystemClient;
+import pl.jaboja.biblioteki.library.LibrarySystemClientFactory;
+import pl.jaboja.biblioteki.library.LibrarySystemException;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -26,8 +27,7 @@ import java.util.concurrent.Executors;
 public class LoansService {
 
     private final LibraryAccountRepository accountRepo;
-    private final PrimoAuthService authService;
-    private final PrimoLoansService loansService;
+    private final LibrarySystemClientFactory clientFactory;
 
     // Wirtualne wątki Java 21 – idealne do I/O-bound równoległych żądań HTTP
     private final ExecutorService executor = Executors.newVirtualThreadPerTaskExecutor();
@@ -54,8 +54,8 @@ public class LoansService {
                 () -> fetchForAccount(account), executor))
             .toList();
 
-        List<Loan> allLoans   = new ArrayList<>();
-        List<String> errors   = new ArrayList<>();
+        List<Loan> allLoans = new ArrayList<>();
+        List<String> errors = new ArrayList<>();
 
         for (var future : futures) {
             try {
@@ -84,7 +84,7 @@ public class LoansService {
      * Znajduje konto powiązane z daną biblioteką i wykonuje renew.
      * 
      * @param loanId ID wypożyczenia w formacie "LIBRARYID_rawLoanId"
-     * @throws PrimoException gdy prolongata się nie powiedzie
+     * @throws LibrarySystemException gdy prolongata się nie powiedzie
      */
     public void renewLoan(String loanId) {
         // Wyodrębnij libraryId z loanId (format: "LIBRARYID_rawLoanId")
@@ -96,26 +96,27 @@ public class LoansService {
         try {
             library = LibraryDefinition.valueOf(libraryId);
         } catch (IllegalArgumentException e) {
-            throw new PrimoException("Unknown library: " + libraryId);
+            throw new LibrarySystemException("Unknown library: " + libraryId);
         }
         
         // Znajdź aktywne konto dla tej biblioteki
         List<LibraryAccount> accounts = accountRepo.findByLibraryAndEnabledTrue(library);
         if (accounts.isEmpty()) {
-            throw new PrimoException("No active account found for library: " + libraryId);
+            throw new LibrarySystemException("No active account found for library: " + libraryId);
         }
         
         // Użyj pierwszego aktywnego konta dla tej biblioteki
         LibraryAccount account = accounts.get(0);
         
         try {
-            var session = authService.login(
+            LibrarySystemClient client = clientFactory.getClient(library);
+            LibrarySession session = client.login(
                 account.getLibrary(), account.getUsername(), account.getPassword());
-            loansService.renewLoan(session, loanId);
-            // Po pomyślnej prolongacie odśwież cache
+            client.renewLoan(session, loanId);
+            // Po pomyslnej prolongacie odswiez cache
             refresh();
             log.info("Successfully renewed loan {} using account {}", loanId, account.getUsername());
-        } catch (PrimoException e) {
+        } catch (LibrarySystemException e) {
             log.error("Failed to renew loan {}: {}", loanId, e.getMessage());
             throw e;
         }
@@ -125,11 +126,12 @@ public class LoansService {
 
     private AccountResult fetchForAccount(LibraryAccount account) {
         try {
-            var session = authService.login(
+            LibrarySystemClient client = clientFactory.getClient(account.getLibrary());
+            LibrarySession session = client.login(
                 account.getLibrary(), account.getUsername(), account.getPassword());
-            var loans = loansService.fetchLoans(session);
+            List<Loan> loans = client.fetchLoans(session);
             return new AccountResult(loans, null);
-        } catch (PrimoException e) {
+        } catch (LibrarySystemException e) {
             log.warn("Failed to fetch loans for {} ({}): {}",
                 account.getUsername(), account.getLibrary().name(), e.getMessage());
             return new AccountResult(List.of(),
