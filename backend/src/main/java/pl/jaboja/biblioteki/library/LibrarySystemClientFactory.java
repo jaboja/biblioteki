@@ -2,6 +2,8 @@ package pl.jaboja.biblioteki.library;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
+import pl.jaboja.biblioteki.library.systems.IntegroSystemClient;
+import pl.jaboja.biblioteki.library.systems.PrimoSystemClient;
 
 import java.util.List;
 import java.util.Map;
@@ -44,9 +46,9 @@ public class LibrarySystemClientFactory {
      * Każda implementacja powinna obsługiwać dokładnie jeden typ systemu.
      */
     private LibrarySystemType getSystemType(LibrarySystemClient client) {
-        if (client instanceof pl.jaboja.biblioteki.primo.PrimoSystemClient) {
+        if (client instanceof PrimoSystemClient) {
             return LibrarySystemType.PRIMO;
-        } else if (client instanceof pl.jaboja.biblioteki.integro.IntegroSystemClient) {
+        } else if (client instanceof IntegroSystemClient) {
             return LibrarySystemType.INTEGRO;
         }
         throw new IllegalArgumentException("Unknown LibrarySystemClient implementation: " + client.getClass().getName());

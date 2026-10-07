@@ -1,21 +1,23 @@
-package pl.jaboja.biblioteki.integro;
+package pl.jaboja.biblioteki.library.systems;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
+import pl.jaboja.biblioteki.config.HttpConfig;
 import pl.jaboja.biblioteki.library.LibraryDefinition;
 import pl.jaboja.biblioteki.library.LibrarySession;
 import pl.jaboja.biblioteki.library.LibrarySystemClient;
 import pl.jaboja.biblioteki.library.LibrarySystemException;
 import pl.jaboja.biblioteki.loans.Loan;
 
+import java.net.CookieManager;
+import java.net.CookiePolicy;
 import java.net.URI;
 import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
 import java.nio.charset.StandardCharsets;
-import java.time.Duration;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeParseException;
@@ -32,10 +34,6 @@ public class IntegroSystemClient implements LibrarySystemClient {
 
     private final ObjectMapper objectMapper = new ObjectMapper();
 
-    private static final String USER_AGENT =
-        "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) " +
-        "AppleWebKit/605.1.15 (KHTML, like Gecko) Version/26.4 Safari/605.1.15";
-
     private static final List<DateTimeFormatter> DATE_FORMATTERS = List.of(
         DateTimeFormatter.ofPattern("yyyy-MM-dd"),
         DateTimeFormatter.ofPattern("dd.MM.yyyy"),
@@ -45,8 +43,10 @@ public class IntegroSystemClient implements LibrarySystemClient {
 
     @Override
     public LibrarySession login(LibraryDefinition library, String username, String password) {
+        var cookieManager = new CookieManager(null, CookiePolicy.ACCEPT_ALL);
         var client = HttpClient.newBuilder()
-            .connectTimeout(Duration.ofSeconds(15))
+            .cookieHandler(cookieManager)
+            .connectTimeout(HttpConfig.TIMEOUT)
             .followRedirects(HttpClient.Redirect.NEVER)
             .version(HttpClient.Version.HTTP_1_1)
             .build();
@@ -61,10 +61,10 @@ public class IntegroSystemClient implements LibrarySystemClient {
             var request = HttpRequest.newBuilder(URI.create(loginUrl))
                 .POST(HttpRequest.BodyPublishers.ofString(body))
                 .header("Content-Type", "application/x-www-form-urlencoded")
-                .header("User-Agent", USER_AGENT)
+                .header("User-Agent", HttpConfig.USER_AGENT)
                 .header("Accept", "text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8")
                 .header("Accept-Language", "pl-PL,pl;q=0.9")
-                .timeout(Duration.ofSeconds(15))
+                .timeout(HttpConfig.TIMEOUT)
                 .build();
 
             var resp = client.send(request, HttpResponse.BodyHandlers.ofString(StandardCharsets.UTF_8));
@@ -104,10 +104,10 @@ public class IntegroSystemClient implements LibrarySystemClient {
         try {
             var request = HttpRequest.newBuilder(URI.create(url))
                 .GET()
-                .header("User-Agent", USER_AGENT)
+                .header("User-Agent", HttpConfig.USER_AGENT)
                 .header("Accept", "application/json, text/html, */*")
                 .header("Accept-Language", "pl-PL,pl;q=0.9")
-                .timeout(Duration.ofSeconds(15))
+                .timeout(HttpConfig.TIMEOUT)
                 .build();
 
             var resp = session.client().send(request, HttpResponse.BodyHandlers.ofString(StandardCharsets.UTF_8));
@@ -151,10 +151,10 @@ public class IntegroSystemClient implements LibrarySystemClient {
             var request = HttpRequest.newBuilder(URI.create(url))
                 .POST(HttpRequest.BodyPublishers.ofString("loan_id=" + loanId))
                 .header("Content-Type", "application/x-www-form-urlencoded")
-                .header("User-Agent", USER_AGENT)
+                .header("User-Agent", HttpConfig.USER_AGENT)
                 .header("Accept", "application/json, text/html, */*")
                 .header("Accept-Language", "pl-PL,pl;q=0.9")
-                .timeout(Duration.ofSeconds(15))
+                .timeout(HttpConfig.TIMEOUT)
                 .build();
 
             var resp = session.client().send(request, HttpResponse.BodyHandlers.ofString(StandardCharsets.UTF_8));
@@ -237,7 +237,7 @@ public class IntegroSystemClient implements LibrarySystemClient {
     private static String textOf(JsonNode node, String field, String defaultValue) {
         JsonNode n = node.get(field);
         if (n == null || n.isNull()) return defaultValue;
-        if (n.isArray() && n.size() > 0) return n.get(0).asText(defaultValue);
+        if (n.isArray() && !n.isEmpty()) return n.get(0).asText(defaultValue);
         return n.asText(defaultValue);
     }
 }

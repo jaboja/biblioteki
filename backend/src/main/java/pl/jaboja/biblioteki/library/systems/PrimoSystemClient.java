@@ -1,9 +1,10 @@
-package pl.jaboja.biblioteki.primo;
+package pl.jaboja.biblioteki.library.systems;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
+import pl.jaboja.biblioteki.config.HttpConfig;
 import pl.jaboja.biblioteki.library.LibraryDefinition;
 import pl.jaboja.biblioteki.library.LibrarySession;
 import pl.jaboja.biblioteki.library.LibrarySystemClient;
@@ -18,7 +19,6 @@ import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
 import java.nio.charset.StandardCharsets;
-import java.time.Duration;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeParseException;
@@ -27,15 +27,15 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
+/**
+ * Klient dla systemu Ex Libris Alma.
+ * Implementacja interfejsu LibrarySystemClient dla systemu Alma/Primo.
+ */
 @Slf4j
 @Component
 public class PrimoSystemClient implements LibrarySystemClient {
 
     private final ObjectMapper objectMapper = new ObjectMapper();
-
-    private static final String USER_AGENT =
-        "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) " +
-        "AppleWebKit/605.1.15 (KHTML, like Gecko) Version/26.4 Safari/605.1.15";
 
     private static final List<DateTimeFormatter> DATE_FORMATTERS = List.of(
         DateTimeFormatter.ofPattern("yyyyMMdd"),
@@ -49,7 +49,7 @@ public class PrimoSystemClient implements LibrarySystemClient {
         var cookieManager = new CookieManager(null, CookiePolicy.ACCEPT_ALL);
         var client = HttpClient.newBuilder()
             .cookieHandler(cookieManager)
-            .connectTimeout(Duration.ofSeconds(10))
+            .connectTimeout(HttpConfig.TIMEOUT)
             .followRedirects(HttpClient.Redirect.NEVER)
             .version(HttpClient.Version.HTTP_1_1)
             .build();
@@ -59,21 +59,23 @@ public class PrimoSystemClient implements LibrarySystemClient {
             var initUrl = library.getBaseUrl() + "/";
             var initReq = HttpRequest.newBuilder(URI.create(initUrl))
                 .GET()
-                .header("User-Agent", USER_AGENT)
+                .header("User-Agent", HttpConfig.USER_AGENT)
                 .header("Accept", "text/html,*/*")
-                .timeout(Duration.ofSeconds(10))
+                .timeout(HttpConfig.TIMEOUT)
                 .build();
             client.send(initReq, HttpResponse.BodyHandlers.discarding());
             log.debug("Initialized session cookies for {}", library.name());
 
             // 2. POST /primaws/suprimaLogin
             var loginUrl = library.getBaseUrl() + "/primaws/suprimaLogin";
+            var instCode = library.getInstCode();
+            assert instCode != null;
             var body = formEncode(Map.of(
                 "authenticationProfile", "Alma",
                 "username",              username,
                 "password",              password,
                 "view",                  library.getVid(),
-                "institution",           library.getInstCode(),
+                "institution",           instCode,
                 "targetUrl",             ""
             ));
             var referer = library.getBaseUrl() + "/nde/login?vid=" + library.getVid() + "&lang=pl";
@@ -83,13 +85,13 @@ public class PrimoSystemClient implements LibrarySystemClient {
                 .header("Content-Type", "application/x-www-form-urlencoded; charset=utf-8")
                 .header("Accept",       "application/json, text/plain, */*")
                 .header("Accept-Language", "pl-PL,pl;q=0.9")
-                .header("User-Agent",   USER_AGENT)
+                .header("User-Agent",   HttpConfig.USER_AGENT)
                 .header("Origin",       library.getBaseUrl())
                 .header("Referer",      referer)
                 .header("Sec-Fetch-Site", "same-origin")
                 .header("Sec-Fetch-Mode", "cors")
                 .header("Sec-Fetch-Dest", "empty")
-                .timeout(Duration.ofSeconds(15));
+                .timeout(HttpConfig.TIMEOUT);
             if (library.isNde()) {
                 loginReqBuilder.header("is-nde", "true");
             }
@@ -129,11 +131,11 @@ public class PrimoSystemClient implements LibrarySystemClient {
             .header("Authorization",    "Bearer \"" + session.token() + "\"")
             .header("Accept",           "application/json, text/plain, */*")
             .header("Accept-Language",  "pl-PL,pl;q=0.9")
-            .header("User-Agent",       USER_AGENT)
+            .header("User-Agent",       HttpConfig.USER_AGENT)
             .header("Sec-Fetch-Site",   "same-origin")
             .header("Sec-Fetch-Mode",   "cors")
             .header("Sec-Fetch-Dest",   "empty")
-            .timeout(Duration.ofSeconds(15));
+            .timeout(HttpConfig.TIMEOUT);
         if (lib.isNde()) {
             reqBuilder.header("is-nde", "true");
         }
@@ -189,11 +191,11 @@ public class PrimoSystemClient implements LibrarySystemClient {
                 .header("Content-Type",     "application/json;charset=utf-8")
                 .header("Accept",           "application/json, text/plain, */*")
                 .header("Accept-Language",  "pl-PL,pl;q=0.9")
-                .header("User-Agent",       USER_AGENT)
+                .header("User-Agent",       HttpConfig.USER_AGENT)
                 .header("Sec-Fetch-Site",   "same-origin")
                 .header("Sec-Fetch-Mode",   "cors")
                 .header("Sec-Fetch-Dest",   "empty")
-                .timeout(Duration.ofSeconds(15));
+                .timeout(HttpConfig.TIMEOUT);
             
             if (lib.isNde()) {
                 reqBuilder.header("is-nde", "true");
@@ -262,7 +264,7 @@ public class PrimoSystemClient implements LibrarySystemClient {
     private static String textOf(JsonNode node, String field, String defaultValue) {
         JsonNode n = node.get(field);
         if (n == null || n.isNull()) return defaultValue;
-        if (n.isArray() && n.size() > 0) return n.get(0).asText(defaultValue);
+        if (n.isArray() && !n.isEmpty()) return n.get(0).asText(defaultValue);
         return n.asText(defaultValue);
     }
 
