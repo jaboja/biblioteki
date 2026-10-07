@@ -123,8 +123,17 @@ export function displayLoans(data: LoansResponse): void {
             title = `<h2>${title}</h2>`;
         }
 
-        let location = loan.libraryName || loan.libraryId;
-        location = location ? `<b>${location}</b> ` : '';
+        let location = loan.libraryId || loan.libraryName;
+        if (!location) {
+            location = '';
+        } else {
+            const size = 100 - ((location.length - 4) * 10);
+            if (size < 100 && size > 50) {
+                location = `<b style="font-size:${size}%">${location}</b> `;
+            } else {
+                location = `<b>${location}</b> `;
+            }
+        }
         if (loan.location) location += loan.location;
 
         let renewButton = '';

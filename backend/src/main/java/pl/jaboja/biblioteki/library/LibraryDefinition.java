@@ -31,7 +31,7 @@ public enum LibraryDefinition {
         null,
         LibrarySystemType.PRIMO
     ),
-    WIMBP_GORZOW(
+    WIMBP(
         "Wojewódzka i Miejska Biblioteka Publiczna (Gorzów Wielkopolski)",
         "https://opac.wimbp.gorzow.pl/integro",
         null,
