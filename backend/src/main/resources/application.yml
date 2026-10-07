@@ -20,8 +20,12 @@ spring:
   jpa:
     database-platform: org.hibernate.dialect.PostgreSQLDialect
     hibernate:
-      ddl-auto: update       # tworzy/aktualizuje schemat automatycznie
+      ddl-auto: validate
     show-sql: false
+
+  flyway:
+    enabled: true
+    baseline-on-migrate: true
     properties:
       hibernate:
         format_sql: true
