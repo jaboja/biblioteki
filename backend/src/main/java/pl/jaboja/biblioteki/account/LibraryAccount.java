@@ -2,13 +2,15 @@ package pl.jaboja.biblioteki.account;
 
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
 import lombok.Getter;
 import lombok.Setter;
+import pl.jaboja.biblioteki.auth.User;
 import pl.jaboja.biblioteki.library.LibraryDefinition;
 
 @Entity
 @Table(name = "library_account",
-       uniqueConstraints = @UniqueConstraint(columnNames = {"library", "username"}))
+       uniqueConstraints = @UniqueConstraint(columnNames = {"user_id", "library", "username"}))
 @Getter
 @Setter
 public class LibraryAccount {
@@ -16,6 +18,11 @@ public class LibraryAccount {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "user_id", nullable = false)
+    @NotNull
+    private User user;
 
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)

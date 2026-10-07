@@ -7,6 +7,8 @@ import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 import pl.jaboja.biblioteki.account.LibraryAccount;
 import pl.jaboja.biblioteki.account.LibraryAccountRepository;
+import pl.jaboja.biblioteki.auth.User;
+import pl.jaboja.biblioteki.auth.UserRepository;
 import pl.jaboja.biblioteki.config.CacheConfig;
 import pl.jaboja.biblioteki.library.LibraryDefinition;
 import pl.jaboja.biblioteki.library.LibrarySession;
@@ -28,22 +30,25 @@ public class LoansService {
 
     private final LibraryAccountRepository accountRepo;
     private final LibrarySystemClientFactory clientFactory;
+    private final UserRepository userRepository;
 
-    // Wirtualne wątki Java 21 – idealne do I/O-bound równoległych żądań HTTP
+    // Wirtualne wątki Java 21 – idealne do I/O-bound równoległych zadań HTTP
     private final ExecutorService executor = Executors.newVirtualThreadPerTaskExecutor();
 
     /**
-     * Zwraca posortowaną listę wszystkich aktywnych wypożyczeń.
+     * Zwraca posortowaną listę wszystkich aktywnych wypożyczeń dla użytkownika.
      *
-     * Klucz cache'a = stały string "all" – wszyscy użytkownicy usługi
-     * widzą te same dane.  TTL = 10 minut (ustawiony w CacheConfig).
+     * Klucz cache'a = userId – każdy użytkownik widzi tylko swoje dane. TTL = 10 minut (ustawiony w CacheConfig).
      *
      * Wywołanie @CacheEvict przed ponownym pobraniem obsługuje
      * endpoint /api/loans/refresh.
      */
-    @Cacheable(value = CacheConfig.LOANS_CACHE, key = "'all'")
-    public LoansResult fetchAll() {
-        List<LibraryAccount> accounts = accountRepo.findByEnabledTrue();
+    @Cacheable(value = CacheConfig.LOANS_CACHE, key = "#userId")
+    public LoansResult fetchAll(Long userId) {
+        User user = userRepository.findById(userId)
+            .orElseThrow(() -> new IllegalArgumentException("Użytkownik nie znaleziony: " + userId));
+        
+        List<LibraryAccount> accounts = accountRepo.findByUserAndEnabledTrue(user);
         if (accounts.isEmpty()) {
             return new LoansResult(List.of(), List.of());
         }
@@ -63,8 +68,8 @@ public class LoansService {
                 allLoans.addAll(result.loans());
                 if (result.error() != null) errors.add(result.error());
             } catch (Exception e) {
-                errors.add("Unexpected error: " + e.getMessage());
-                log.error("Unexpected error joining future", e);
+                errors.add("Niespodziewany błąd: " + e.getMessage());
+                log.error("Niespodziewany błąd podczas łączenia future", e);
             }
         }
 
@@ -73,20 +78,21 @@ public class LoansService {
     }
 
     /** Evictuje cache i wywołuje fetchAll() na świeżo. */
-    @CacheEvict(value = CacheConfig.LOANS_CACHE, key = "'all'")
-    public LoansResult refresh() {
-        log.info("Cache evicted – refreshing loans");
-        return fetchAll();
+    @CacheEvict(value = CacheConfig.LOANS_CACHE, key = "#userId")
+    public LoansResult refresh(Long userId) {
+        log.info("Cache evicted – refreshing loans for user {}", userId);
+        return fetchAll(userId);
     }
 
     /**
      * Procesuje prolongatę pojedynczego wypożyczenia.
-     * Znajduje konto powiązane z daną biblioteką i wykonuje renew.
+     * Znajduje konto powiązane z daną biblioteką i użytkownikiem i wykonuje renew.
      * 
+     * @param userId ID użytkownika
      * @param loanId ID wypożyczenia w formacie "LIBRARYID_rawLoanId"
      * @throws LibrarySystemException gdy prolongata się nie powiedzie
      */
-    public void renewLoan(String loanId) {
+    public void renewLoan(Long userId, String loanId) {
         // Wyodrębnij libraryId z loanId (format: "LIBRARYID_rawLoanId")
         String libraryId = loanId.contains("_") ? 
             loanId.substring(0, loanId.indexOf("_")) : loanId;
@@ -96,13 +102,16 @@ public class LoansService {
         try {
             library = LibraryDefinition.valueOf(libraryId);
         } catch (IllegalArgumentException e) {
-            throw new LibrarySystemException("Unknown library: " + libraryId);
+            throw new LibrarySystemException("Nieznana biblioteka: " + libraryId);
         }
         
-        // Znajdź aktywne konto dla tej biblioteki
-        List<LibraryAccount> accounts = accountRepo.findByLibraryAndEnabledTrue(library);
+        User user = userRepository.findById(userId)
+            .orElseThrow(() -> new IllegalArgumentException("Użytkownik nie znaleziony: " + userId));
+        
+        // Znajdź aktywne konto dla tej biblioteki i użytkownika
+        List<LibraryAccount> accounts = accountRepo.findByUserAndLibraryAndEnabledTrue(user, library);
         if (accounts.isEmpty()) {
-            throw new LibrarySystemException("No active account found for library: " + libraryId);
+            throw new LibrarySystemException("Brak aktywnego konta dla biblioteki: " + libraryId + " i użytkownika: " + userId);
         }
         
         // Użyj pierwszego aktywnego konta dla tej biblioteki
@@ -113,11 +122,11 @@ public class LoansService {
             LibrarySession session = client.login(
                 account.getLibrary(), account.getUsername(), account.getPassword());
             client.renewLoan(session, loanId);
-            // Po pomyslnej prolongacie odswiez cache
-            refresh();
-            log.info("Successfully renewed loan {} using account {}", loanId, account.getUsername());
+            // Po pomyślnej prolongacie odśwież cache
+            refresh(userId);
+            log.info("Pomyślnie przedłużono wypożyczenie {} przy użyciu konta {}", loanId, account.getUsername());
         } catch (LibrarySystemException e) {
-            log.error("Failed to renew loan {}: {}", loanId, e.getMessage());
+            log.error("Błąd podczas przedłużania wypożyczenia {}: {}", loanId, e.getMessage());
             throw e;
         }
     }
@@ -132,7 +141,7 @@ public class LoansService {
             List<Loan> loans = client.fetchLoans(session);
             return new AccountResult(loans, null);
         } catch (LibrarySystemException e) {
-            log.warn("Failed to fetch loans for {} ({}): {}",
+            log.warn("Błąd podczas pobierania wypożyczeń dla {} ({}): {}",
                 account.getUsername(), account.getLibrary().name(), e.getMessage());
             return new AccountResult(List.of(),
                 account.getLibrary().getDisplayName() + ": " + e.getMessage());
@@ -143,6 +152,6 @@ public class LoansService {
 
     private record AccountResult(List<Loan> loans, String error) {}
 
-    /** Publiczny wynik – lista pożyczonych + ewentualne błędy per biblioteka. */
+    /** Publiczny wynik – lista pobranych + ewentualne błędy per biblioteka. */
     public record LoansResult(List<Loan> loans, List<String> errors) {}
 }
