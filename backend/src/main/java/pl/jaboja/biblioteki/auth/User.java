@@ -40,6 +40,9 @@ public class User implements UserDetails {
     @Column
     private String roles = "USER";  // Comma-separated roles
 
+    @Column(name = "is_deleted")
+    private boolean deleted = false;
+
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
         return List.of(roles.split(","))
