@@ -7,6 +7,7 @@ target/
 ### Service and deployment files ###
 !biblioteki.service
 !scripts/
+!nginx/
 
 ### STS ###
 .apt_generated
