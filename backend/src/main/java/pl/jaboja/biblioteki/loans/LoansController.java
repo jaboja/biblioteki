@@ -7,6 +7,9 @@ import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -21,6 +24,14 @@ public class LoansController {
 
     private final LoansService loansService;
 
+    private Long getCurrentUserId() {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        if (authentication != null && authentication.getPrincipal() instanceof pl.jaboja.biblioteki.auth.User) {
+            return ((pl.jaboja.biblioteki.auth.User) authentication.getPrincipal()).getId();
+        }
+        throw new IllegalStateException("Użytkownik nie jest uwierzytelniony");
+    }
+
     @Operation(
         summary = "Pobierz listę wypożyczeń",
         description = "Zwraca aktualny stan wypożyczeń (z cache lub świeże przy pierwszym wywołaniu / po wygaśnięciu TTL 10 min)",
@@ -30,13 +41,15 @@ public class LoansController {
         }
     )
     @GetMapping
+    @PreAuthorize("isAuthenticated()")
     public ResponseEntity<LoansResponse> getLoans() {
-        var result = loansService.fetchAll();
+        Long userId = getCurrentUserId();
+        var result = loansService.fetchAll(userId);
         return ResponseEntity.ok(LoansResponse.from(result));
     }
 
     @Operation(
-        summary = "Wymuś odświeżenie wypożyczeń",
+        summary = "Wymus odświeżenie wypożyczeń",
         description = "Wymusza natychmiastowe ponowne pobranie danych z bibliotek, ignorując cache",
         responses = {
             @ApiResponse(responseCode = "200", description = "Odświeżona lista wypożyczeń",
@@ -44,8 +57,10 @@ public class LoansController {
         }
     )
     @PostMapping("/refresh")
+    @PreAuthorize("isAuthenticated()")
     public ResponseEntity<LoansResponse> refresh() {
-        var result = loansService.refresh();
+        Long userId = getCurrentUserId();
+        var result = loansService.refresh(userId);
         return ResponseEntity.ok(LoansResponse.from(result));
     }
 
@@ -60,8 +75,10 @@ public class LoansController {
         }
     )
     @PostMapping("/{loanId}/renew")
+    @PreAuthorize("isAuthenticated()")
     public ResponseEntity<String> renewLoan(@PathVariable String loanId) {
-        loansService.renewLoan(loanId);
-        return ResponseEntity.ok("Loan " + loanId + " renewed successfully");
+        Long userId = getCurrentUserId();
+        loansService.renewLoan(userId, loanId);
+        return ResponseEntity.ok("Wypożyczenie " + loanId + " przedłużone pomyślnie");
     }
 }

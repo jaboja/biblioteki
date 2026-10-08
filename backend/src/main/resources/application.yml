@@ -20,8 +20,15 @@ spring:
   jpa:
     database-platform: org.hibernate.dialect.PostgreSQLDialect
     hibernate:
-      ddl-auto: update       # tworzy/aktualizuje schemat automatycznie
+      ddl-auto: validate
     show-sql: false
+
+  flyway:
+    enabled: true
+    baseline-on-migrate: true
+    baseline-version: 0
+    clean-disabled: true
+    locations: classpath:db/migration
     properties:
       hibernate:
         format_sql: true
@@ -58,3 +65,4 @@ logging:
   level:
     pl.jaboja: DEBUG
     org.springframework.cache: TRACE   # usuń na produkcji
+    org.flywaydb: DEBUG

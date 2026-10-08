@@ -1,6 +1,9 @@
 package pl.jaboja.biblioteki.mcp.tools;
 
 import org.springframework.ai.mcp.annotation.McpTool;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
+import pl.jaboja.biblioteki.auth.User;
 import pl.jaboja.biblioteki.loans.LoansResponse;
 import pl.jaboja.biblioteki.loans.LoansService;
 
@@ -16,6 +19,14 @@ public class LoansTools {
         this.loansService = loansService;
     }
 
+    private Long getCurrentUserId() {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        if (authentication != null && authentication.getPrincipal() instanceof User) {
+            return ((User) authentication.getPrincipal()).getId();
+        }
+        throw new IllegalStateException("Użytkownik nie jest uwierzytelniony");
+    }
+
     /**
      * Retrieves the current list of loans (from cache).
      * This is the same data returned by GET /api/loans.
@@ -26,7 +37,8 @@ public class LoansTools {
         title = "List Loans"
     )
     public LoansResponse listLoans() {
-        var result = loansService.fetchAll();
+        Long userId = getCurrentUserId();
+        var result = loansService.fetchAll(userId);
         return LoansResponse.from(result);
     }
 
@@ -40,7 +52,8 @@ public class LoansTools {
         title = "Refresh Loans"
     )
     public LoansResponse refreshLoans() {
-        var result = loansService.refresh();
+        Long userId = getCurrentUserId();
+        var result = loansService.refresh(userId);
         return LoansResponse.from(result);
     }
 
@@ -54,7 +67,8 @@ public class LoansTools {
         title = "Renew Loan"
     )
     public String renewLoan(String loanId) {
-        loansService.renewLoan(loanId);
-        return "Loan " + loanId + " renewed successfully";
+        Long userId = getCurrentUserId();
+        loansService.renewLoan(userId, loanId);
+        return "Wypożyczenie " + loanId + " przedłużone pomyślnie";
     }
 }

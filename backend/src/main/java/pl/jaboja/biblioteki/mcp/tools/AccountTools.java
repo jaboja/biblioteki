@@ -1,9 +1,12 @@
 package pl.jaboja.biblioteki.mcp.tools;
 
 import org.springframework.ai.mcp.annotation.McpTool;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import pl.jaboja.biblioteki.account.LibraryAccount;
 import pl.jaboja.biblioteki.account.LibraryAccountRepository;
 import pl.jaboja.biblioteki.account.LibraryResponse;
+import pl.jaboja.biblioteki.auth.User;
 import pl.jaboja.biblioteki.library.LibraryDefinition;
 
 import java.util.List;
@@ -39,20 +42,28 @@ public class AccountTools {
         this.accountRepository = accountRepository;
     }
 
+    private User getCurrentUser() {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        if (authentication != null && authentication.getPrincipal() instanceof User) {
+            return ((User) authentication.getPrincipal());
+        }
+        throw new IllegalStateException("Użytkownik nie jest uwierzytelniony");
+    }
+
     /**
-     * Lists all enabled library accounts.
+     * Lists all enabled library accounts for the current user.
      * Note: Passwords and usernames are NOT included in the response.
      * Disabled accounts are omitted from the list.
      */
     @McpTool(
         name = "list_accounts",
-        description = "Zwraca listę aktywnych kont dostępu do bibliotek (bez nazw użytkowników i haseł).",
+        description = "Zwraca listę aktywnych kont dostępu do bibliotek (bez nazw użytkowników i haseł) dla aktualnie zalogowanego użytkownika.",
         title = "List Accounts"
     )
     public List<McpAccountResponse> listAccounts() {
-        return accountRepository.findAll()
+        User currentUser = getCurrentUser();
+        return accountRepository.findByUserAndEnabledTrue(currentUser)
             .stream()
-            .filter(LibraryAccount::isEnabled)
             .map(McpAccountResponse::from)
             .toList();
     }
