@@ -11,10 +11,23 @@ fi
 
 DEST="$1"
 
+# --- Funkcje pomocnicze ---
+GREEN='\033[0;32m'
+RED='\033[0;31m'
+NC='\033[0m' # No Color
+
+info() {
+    echo -e "${GREEN}[OK]${NC} $1"
+}
+
+error() {
+    echo -e "${RED}[BŁĄD]${NC} $1" >&2
+    exit 1
+}
+
 # Sprawdź czy mvnw istnieje
 if [ ! -f "./mvnw" ]; then
-    echo "[BŁĄD] Nie znaleziono pliku ./mvnw w bieżącym katalogu."
-    exit 1
+    error "Nie znaleziono pliku ./mvnw w bieżącym katalogu."
 fi
 
 # Buduj JAR
@@ -23,17 +36,17 @@ fi
 # Znajdź plik JAR
 JAR_FILE=$(find target -maxdepth 1 -name "biblioteki-*.jar" -type f | head -1)
 if [ -z "$JAR_FILE" ]; then
-    echo "[BŁĄD] Nie znaleziono pliku JAR w katalogu target/"
-    exit 1
+    error "Nie znaleziono pliku JAR w katalogu target/"
 fi
 
-echo "[OK] Znaleziono plik JAR: $JAR_FILE"
+info "Znaleziono plik JAR: $JAR_FILE"
 
 # Kopiuj pliki na serwer
-cp "$JAR_FILE" target/biblioteki.jar
-scp target/biblioteki.jar "$DEST/"
-scp backend/biblioteki.service "$DEST/"
-scp backend/scripts/install.sh "$DEST/"
-scp backend/nginx/biblioteki.conf "$DEST/"
+mv "$JAR_FILE" ./target/biblioteki.jar
+scp ./target/biblioteki.jar "$DEST/"
+mv ./target/biblioteki.jar "$JAR_FILE"
+scp ./biblioteki.service "$DEST/"
+scp ./scripts/install.sh "$DEST/"
+scp ./nginx/biblioteki.conf "$DEST/"
 
-echo "[OK] Pliki zostały skopiowane pomyślnie na $DEST"
+info "Pliki zostały skopiowane pomyślnie na $DEST"

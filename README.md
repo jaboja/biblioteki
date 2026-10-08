@@ -141,9 +141,21 @@ Wszystkie trzy komponenty korzystają z systemu Ex Libris Alma:
 
 1. **Aplikacja webowa (backend+frontend):**
 
+   Lokalnie:
+
 ```bash
 cd backend
 ./mvnw spring-boot:run
+```
+
+   Deployment:
+
+```bash
+cd backend
+./scripts/build-and-copy.sh user@server.tld:/opt/biblioteki
+ssh user@server.tld
+cd /opt/biblioteki
+sudo ./install.sh
 ```
 
 2. **Widget:**

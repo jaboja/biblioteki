@@ -2,8 +2,7 @@
 set -euo pipefail
 
 # --- Ustawienia domyślne ---
-SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
-BASE_DIR="$(dirname "$SCRIPT_DIR")"
+BASE_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 SERVICE_FILE="$BASE_DIR/biblioteki.service"
 SERVICE_LINK="/etc/systemd/system/biblioteki.service"
 ENV_FILE="/etc/biblioteki.env"
@@ -14,12 +13,16 @@ GROUP="biblioteki"
 LOG_DIR="/var/log/biblioteki"
 
 # --- Funkcje pomocnicze ---
+GREEN='\033[0;32m'
+RED='\033[0;31m'
+NC='\033[0m' # No Color
+
 info() {
-    echo "[OK] $1"
+    echo -e "${GREEN}[OK]${NC} $1"
 }
 
 error() {
-    echo "[BŁĄD] $1" >&2
+    echo -e "${RED}[BŁĄD]${NC} $1" >&2
     exit 1
 }
 
@@ -116,15 +119,10 @@ fi
 
 # --- Generuj JWT_SECRET ---
 JWT_SECRET=$(generate_secret)
-info "Wygenerowany JWT_SECRET (zapisz go w bezpiecznym miejscu!):"
-echo "  $JWT_SECRET"
+info "Wygenerowany JWT_SECRET: $JWT_SECRET"
 
 # --- Konfiguracja bazy danych ---
 if [ "$CREATE_DB" = true ]; then
-    # Pytaj o hasło administratora PostgreSQL
-    read -sp "Podaj hasło administratora PostgreSQL (postgres): " PG_ADMIN_PASSWORD
-    echo ""
-
     # Użytkownik systemowy i użytkownik bazy danych są tacy sami
     DB_USER="$USER"
     DB_PASSWORD=$(generate_secret)
@@ -132,15 +130,15 @@ if [ "$CREATE_DB" = true ]; then
 
     # Wykonaj polecenia PostgreSQL
     info "Tworzę użytkownika i bazę danych..."
-    sudo -u postgres PGPASSWORD="$PG_ADMIN_PASSWORD" psql -h localhost -c "CREATE USER $DB_USER WITH PASSWORD '$DB_PASSWORD';" 2>/dev/null || \
-        error "Nie udało się utworzyć użytkownika. Sprawdź hasło administratora PostgreSQL."
-    sudo -u postgres PGPASSWORD="$PG_ADMIN_PASSWORD" psql -h localhost -c "CREATE DATABASE $DB_NAME OWNER $DB_USER;" 2>/dev/null || \
+    sudo -u postgres psql -c "CREATE USER $DB_USER WITH PASSWORD '$DB_PASSWORD';" || \
+        error "Nie udało się utworzyć użytkownika."
+    sudo -u postgres psql -c "CREATE DATABASE $DB_NAME OWNER $DB_USER;" || \
         error "Nie udało się utworzyć bazy danych."
-    sudo -u postgres PGPASSWORD="$PG_ADMIN_PASSWORD" psql -h localhost -c "GRANT ALL PRIVILEGES ON DATABASE $DB_NAME TO $DB_USER;" 2>/dev/null || \
+    sudo -u postgres psql -c "GRANT ALL PRIVILEGES ON DATABASE $DB_NAME TO $DB_USER;" || \
         error "Nie udało się nadać uprawnień."
 
     info "Użytkownik i baza danych utworzeni."
-    info "Wygenerowane hasło do bazy (zapisz je!): $DB_PASSWORD"
+    info "Wygenerowane hasło do bazy: $DB_PASSWORD"
     info "Nazwa użytkownika: $DB_USER"
     info "Nazwa bazy: $DB_NAME"
 
@@ -200,11 +198,11 @@ info "========================================="
 info "Instalacja zakończona pomyślnie!"
 info ""
 info "Aplikacja jest dostępna pod adresem:"
-info "  http://localhost:8292"
+info "  http://127.0.0.1:8292"
 info ""
 info "API:"
-info "  http://localhost:8292/api/loans"
-info "  http://localhost:8292/swagger-ui.html"
+info "  http://127.0.0.1:8292/api/loans"
+info "  http://127.0.0.1:8292/swagger-ui.html"
 info ""
 info "Logi:"
 info "  journalctl -u biblioteki -f"
