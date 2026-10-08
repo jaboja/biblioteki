@@ -4,11 +4,9 @@ target/
 !**/src/test/**/target/
 /src/main/resources/static/
 
-### Service files ###
-biblioteki.service
-
-### Scripts ###
-scripts/
+### Service and deployment files ###
+!biblioteki.service
+!scripts/
 
 ### STS ###
 .apt_generated
