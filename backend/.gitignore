@@ -4,6 +4,12 @@ target/
 !**/src/test/**/target/
 /src/main/resources/static/
 
+### Service files ###
+biblioteki.service
+
+### Scripts ###
+scripts/
+
 ### STS ###
 .apt_generated
 .classpath
