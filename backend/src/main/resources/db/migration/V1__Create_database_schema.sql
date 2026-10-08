@@ -10,14 +10,14 @@ CREATE TABLE app_users (
     roles VARCHAR(255) DEFAULT 'USER'
 );
 
--- Create library_account table (without user_id initially, will be added in V2)
+-- Create library_account table
 CREATE TABLE library_account (
     id BIGSERIAL PRIMARY KEY,
+    user_id BIGINT NOT NULL,
     library VARCHAR(50) NOT NULL,
     username VARCHAR(255) NOT NULL,
     password VARCHAR(255) NOT NULL,
-    enabled BOOLEAN DEFAULT TRUE
+    enabled BOOLEAN DEFAULT TRUE,
+    CONSTRAINT fk_library_account_user FOREIGN KEY (user_id) REFERENCES app_users(id),
+    CONSTRAINT uk_user_library_username UNIQUE (user_id, library, username)
 );
-
--- Create unique constraint for library_account
-ALTER TABLE library_account ADD CONSTRAINT uk_library_username UNIQUE (library, username);
