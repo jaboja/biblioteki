@@ -6,7 +6,7 @@ import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
-import org.springframework.lang.NonNull;
+import org.jspecify.annotations.NonNull;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -32,14 +32,14 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
             @NonNull HttpServletRequest request,
             @NonNull HttpServletResponse response,
             @NonNull FilterChain filterChain) throws ServletException, IOException {
-        
+
         final String token = getTokenFromRequest(request);
-        
+
         if (token != null && jwtService.isTokenValid(token)) {
             final String username = jwtService.extractUsername(token);
-            
+
             UserDetails userDetails = userService.loadUserByUsername(username);
-            
+
             UsernamePasswordAuthenticationToken authentication = 
                 new UsernamePasswordAuthenticationToken(
                     userDetails, 
@@ -49,10 +49,10 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
             authentication.setDetails(
                 new WebAuthenticationDetailsSource().buildDetails(request)
             );
-            
+
             SecurityContextHolder.getContext().setAuthentication(authentication);
         }
-        
+
         filterChain.doFilter(request, response);
     }
 
@@ -62,7 +62,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         if (authHeader != null && authHeader.startsWith("Bearer ")) {
             return authHeader.substring(7);
         }
-        
+
         // 2. Check cookie
         Cookie[] cookies = request.getCookies();
         if (cookies != null) {
@@ -72,13 +72,13 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
                 .findFirst()
                 .orElse(null);
         }
-        
+
         // 3. Check query parameter (for development)
         String tokenParam = request.getParameter("token");
         if (tokenParam != null && !tokenParam.isEmpty()) {
             return tokenParam;
         }
-        
+
         return null;
     }
 }

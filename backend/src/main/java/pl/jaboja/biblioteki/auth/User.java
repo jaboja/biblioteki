@@ -3,12 +3,13 @@ package pl.jaboja.biblioteki.auth;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
+import org.jspecify.annotations.NullMarked;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
 import java.util.Collection;
-import java.util.List;
+import java.util.stream.Stream;
 
 /**
  * User entity for authentication.
@@ -40,32 +41,14 @@ public class User implements UserDetails {
     @Column
     private String roles = "USER";  // Comma-separated roles
 
-    @Column(name = "is_deleted")
-    private boolean deleted = false;
-
     @Override
+    @NullMarked
     public Collection<? extends GrantedAuthority> getAuthorities() {
-        return List.of(roles.split(","))
-            .stream()
+        return Stream.of(roles.split(","))
             .map(String::trim)
             .filter(s -> !s.isEmpty())
-            .map(SimpleGrantedAuthority::new)
+            .map(role -> new SimpleGrantedAuthority("ROLE_" + role))
             .toList();
-    }
-
-    @Override
-    public boolean isAccountNonExpired() {
-        return true;
-    }
-
-    @Override
-    public boolean isAccountNonLocked() {
-        return true;
-    }
-
-    @Override
-    public boolean isCredentialsNonExpired() {
-        return true;
     }
 
     // All-args constructor for convenience
