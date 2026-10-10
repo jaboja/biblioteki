@@ -498,6 +498,21 @@ class UserControllerTest {
             .andExpect(status().isForbidden());
     }
 
+    @Test
+    @WithMockUser(username = "user1", roles = {"USER"})
+    void updateUser_NonAdminCanDisableSelfViaEdit() throws Exception {
+        UserRequest request = new UserRequest("user1", null, null, "USER", false);
+
+        when(userService.findByUsername("user1")).thenReturn(Optional.of(regularUser));
+        when(userService.findById(2L)).thenReturn(Optional.of(regularUser));
+        when(userService.updateUser(any(User.class), anyString())).thenReturn(regularUser);
+
+        mockMvc.perform(put("/api/users/2")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(objectMapper.writeValueAsString(request)))
+            .andExpect(status().isOk());
+    }
+
     // ==================== POST /api/users/{id}/enable ====================
 
     @Test

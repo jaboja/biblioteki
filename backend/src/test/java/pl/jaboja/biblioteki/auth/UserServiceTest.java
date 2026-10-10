@@ -157,6 +157,18 @@ class UserServiceTest {
     }
 
     @Test
+    void updateUser_NonAdminCanDisableSelf() {
+        User user = new User(2L, "user1", "encodedPassword", "Regular User", false, "USER");
+        when(userRepository.save(any(User.class))).thenReturn(user);
+        when(userRepository.countByRolesContainingAndEnabledTrue("ADMIN")).thenReturn(1L);
+
+        User result = userService.updateUser(user, null);
+        
+        assertNotNull(result);
+        verify(userRepository).save(any(User.class));
+    }
+
+    @Test
     void disableUser_ShouldSetEnabledToFalse() {
         when(userRepository.findById(3L)).thenReturn(Optional.of(targetUser));
         when(userRepository.save(any(User.class))).thenReturn(targetUser);
