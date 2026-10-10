@@ -453,6 +453,41 @@ class UserControllerTest {
             .andExpect(status().isUnauthorized());
     }
 
+    // ==================== Last Admin Protection Tests ====================
+
+    @Test
+    @WithMockUser(username = "admin", roles = {"ADMIN"})
+    void updateUser_LastAdminCannotDisableSelfViaEdit() throws Exception {
+        UserRequest request = new UserRequest("admin", null, null, false, "ADMIN");
+        
+        when(userService.findByUsername("admin")).thenReturn(Optional.of(adminUser));
+        when(userService.findById(1L)).thenReturn(Optional.of(adminUser));
+        when(userService.updateUser(any(User.class), anyString()))
+            .thenThrow(new AccessDeniedException("Cannot disable the last admin account"));
+        
+        mockMvc.perform(put("/api/users/1")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(objectMapper.writeValueAsString(request)))
+            .andExpect(status().isForbidden());
+    }
+
+    @Test
+    @WithMockUser(username = "admin", roles = {"ADMIN"})
+    void updateUser_LastAdminCannotDisableOtherAdminViaEdit() throws Exception {
+        User otherAdmin = new User(2L, "admin2", "encodedPassword", "Other Admin", true, "ADMIN");
+        UserRequest request = new UserRequest("admin2", null, null, false, "ADMIN");
+        
+        when(userService.findByUsername("admin")).thenReturn(Optional.of(adminUser));
+        when(userService.findById(2L)).thenReturn(Optional.of(otherAdmin));
+        when(userService.updateUser(any(User.class), anyString()))
+            .thenThrow(new AccessDeniedException("Cannot disable the last admin account"));
+        
+        mockMvc.perform(put("/api/users/2")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(objectMapper.writeValueAsString(request)))
+            .andExpect(status().isForbidden());
+    }
+
     // ==================== POST /api/users/{id}/enable ====================
 
     @Test

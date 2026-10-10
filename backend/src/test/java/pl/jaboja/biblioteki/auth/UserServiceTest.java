@@ -129,6 +129,33 @@ class UserServiceTest {
     }
 
     @Test
+    void updateUser_LastAdminCannotDisableSelf() {
+        User lastAdmin = new User(1L, "admin", "encodedPassword", "Admin User", false, "ADMIN");
+        when(userRepository.save(any(User.class))).thenReturn(lastAdmin);
+        when(userRepository.countByRolesContainingAndEnabledTrue("ADMIN")).thenReturn(1L);
+        
+        assertThrows(AccessDeniedException.class, () -> {
+            userService.updateUser(lastAdmin, null);
+        });
+        
+        verify(userRepository, never()).save(any(User.class));
+    }
+
+    @Test
+    void updateUser_LastAdminCannotDisableOtherAdmin() {
+        User lastAdmin = new User(1L, "admin", "encodedPassword", "Admin User", true, "ADMIN");
+        User otherAdmin = new User(2L, "admin2", "encodedPassword", "Other Admin", false, "ADMIN");
+        when(userRepository.save(any(User.class))).thenReturn(otherAdmin);
+        when(userRepository.countByRolesContainingAndEnabledTrue("ADMIN")).thenReturn(1L);
+        
+        assertThrows(AccessDeniedException.class, () -> {
+            userService.updateUser(otherAdmin, null);
+        });
+        
+        verify(userRepository, never()).save(any(User.class));
+    }
+
+    @Test
     void disableUser_ShouldSetEnabledToFalse() {
         when(userRepository.findById(3L)).thenReturn(Optional.of(targetUser));
         when(userRepository.countByRolesContainingAndEnabledTrue("ADMIN")).thenReturn(1L);
