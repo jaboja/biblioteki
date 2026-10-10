@@ -6,11 +6,11 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.webmvc.test.autoconfigure.AutoConfigureMockMvc;
-import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.http.MediaType;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.test.context.support.WithMockUser;
+import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
 
 import java.util.List;
@@ -21,7 +21,8 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @SpringBootTest
 @AutoConfigureMockMvc
@@ -30,8 +31,7 @@ class UserControllerTest {
     @Autowired
     private MockMvc mockMvc;
 
-    @Autowired
-    private ObjectMapper objectMapper;
+    private final ObjectMapper objectMapper = new ObjectMapper();
 
     @MockitoBean
     private UserService userService;
@@ -45,6 +45,11 @@ class UserControllerTest {
         adminUser = new User(1L, "admin", "encodedPassword", "Admin User", true, "ADMIN");
         regularUser = new User(2L, "user1", "encodedPassword", "Regular User", true, "USER");
         targetUser = new User(3L, "user2", "encodedPassword", "Target User", true, "USER");
+        
+        // Configure mock to return appropriate users
+        when(userService.findByUsername("admin")).thenReturn(Optional.of(adminUser));
+        when(userService.findByUsername("user1")).thenReturn(Optional.of(regularUser));
+        when(userService.findByUsername("user2")).thenReturn(Optional.of(targetUser));
     }
 
     // ==================== GET /api/users ====================

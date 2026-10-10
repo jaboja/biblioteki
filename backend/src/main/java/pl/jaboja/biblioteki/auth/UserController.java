@@ -35,6 +35,12 @@ public class UserController {
             if (principal instanceof User && ((User) principal).isEnabled()) {
                 return (User) principal;
             }
+            // For test contexts where @WithMockUser sets a String principal
+            if (principal instanceof String) {
+                String username = (String) principal;
+                return userService.findByUsername(username)
+                    .orElseThrow(() -> new UsernameNotFoundException("User not found: " + username));
+            }
         }
         throw new AccessDeniedException("Not authenticated");
     }

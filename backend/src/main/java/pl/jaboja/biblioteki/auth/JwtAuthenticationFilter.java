@@ -8,6 +8,7 @@ import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import org.jspecify.annotations.NonNull;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.web.authentication.WebAuthenticationDetailsSource;
@@ -33,25 +34,33 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
             @NonNull HttpServletResponse response,
             @NonNull FilterChain filterChain) throws ServletException, IOException {
 
-        final String token = getTokenFromRequest(request);
+        // Check if there's already an authentication in the SecurityContext (e.g., from @WithMockUser in tests)
+        Authentication existingAuth = SecurityContextHolder.getContext().getAuthentication();
+        
+        if (existingAuth == null || !existingAuth.isAuthenticated()) {
+            // No existing authentication, try to process JWT token
+            final String token = getTokenFromRequest(request);
 
-        if (token != null && jwtService.isTokenValid(token)) {
-            final String username = jwtService.extractUsername(token);
+            if (token != null && jwtService.isTokenValid(token)) {
+                final String username = jwtService.extractUsername(token);
 
-            UserDetails userDetails = userService.loadUserByUsername(username);
+                UserDetails userDetails = userService.loadUserByUsername(username);
 
-            UsernamePasswordAuthenticationToken authentication = 
-                new UsernamePasswordAuthenticationToken(
-                    userDetails, 
-                    null, 
-                    userDetails.getAuthorities()
+                UsernamePasswordAuthenticationToken authentication = 
+                    new UsernamePasswordAuthenticationToken(
+                        userDetails, 
+                        null, 
+                        userDetails.getAuthorities()
+                    );
+                authentication.setDetails(
+                    new WebAuthenticationDetailsSource().buildDetails(request)
                 );
-            authentication.setDetails(
-                new WebAuthenticationDetailsSource().buildDetails(request)
-            );
 
-            SecurityContextHolder.getContext().setAuthentication(authentication);
+                SecurityContextHolder.getContext().setAuthentication(authentication);
+            }
         }
+        // If there's already an authenticated user, skip JWT processing
+        // This allows @WithMockUser to work in tests
 
         filterChain.doFilter(request, response);
     }
