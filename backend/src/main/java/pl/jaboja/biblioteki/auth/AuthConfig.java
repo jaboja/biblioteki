@@ -28,7 +28,7 @@ public class AuthConfig {
                 admin.setEnabled(true);
                 admin.setRoles("ADMIN,USER");
                 userRepository.save(admin);
-                
+
                 User user = new User();
                 user.setUsername("user");
                 user.setPassword(passwordEncoder.encode("user123"));
@@ -36,7 +36,7 @@ public class AuthConfig {
                 user.setEnabled(true);
                 user.setRoles("USER");
                 userRepository.save(user);
-                
+
                 System.out.println("Created default users: admin/admin123, user/user123");
             }
         };

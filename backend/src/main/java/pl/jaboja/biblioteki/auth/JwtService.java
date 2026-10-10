@@ -1,7 +1,6 @@
 package pl.jaboja.biblioteki.auth;
 
 import io.jsonwebtoken.Claims;
-import io.jsonwebtoken.JwtParser;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
 import lombok.RequiredArgsConstructor;
@@ -37,7 +36,7 @@ public class JwtService {
         if (user.getFullName() != null) {
             claims.put("fullName", user.getFullName());
         }
-        
+
         return Jwts.builder()
             .setClaims(claims)
             .setSubject(user.getUsername())

@@ -55,7 +55,7 @@ public class IntegroSystemClient implements LibrarySystemClient {
             // Integro używa zwykle formularza logowania POST
             // Dla WIMBP Gorzów: https://opac.wimbp.gorzow.pl/integro/login
             var loginUrl = library.getBaseUrl() + "/login";
-            
+
             var body = "login=" + username + "&password=" + password + "&submit=Zaloguj";
 
             var request = HttpRequest.newBuilder(URI.create(loginUrl))
@@ -122,7 +122,7 @@ public class IntegroSystemClient implements LibrarySystemClient {
             // Parsuj odpowiedź HTML lub JSON w zależności od formatu
             // Dla Integro odpowiedź może być HTML, więc szukamy danych w strukturze HTML
             String responseBody = resp.body();
-            
+
             // Jeśli odpowiedź jest JSON
             if (responseBody.trim().startsWith("{")) {
                 return parseJsonLoans(responseBody, lib);
@@ -181,7 +181,7 @@ public class IntegroSystemClient implements LibrarySystemClient {
         try {
             JsonNode root = objectMapper.readTree(json);
             JsonNode loanArray = root.path("loans");
-            
+
             if (!loanArray.isArray()) {
                 log.debug("No loans array in response for {}", library.name());
                 return List.of();

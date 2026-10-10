@@ -47,7 +47,7 @@ public class LoansService {
     public LoansResult fetchAll(Long userId) {
         User user = userRepository.findById(userId)
             .orElseThrow(() -> new IllegalArgumentException("Użytkownik nie znaleziony: " + userId));
-        
+
         List<LibraryAccount> accounts = accountRepo.findByUserAndEnabledTrue(user);
         if (accounts.isEmpty()) {
             return new LoansResult(List.of(), List.of());
@@ -96,7 +96,7 @@ public class LoansService {
         // Wyodrębnij libraryId z loanId (format: "LIBRARYID_rawLoanId")
         String libraryId = loanId.contains("_") ? 
             loanId.substring(0, loanId.indexOf("_")) : loanId;
-        
+
         // Zamień libraryId string na LibraryDefinition enum
         LibraryDefinition library = null;
         try {
@@ -104,19 +104,19 @@ public class LoansService {
         } catch (IllegalArgumentException e) {
             throw new LibrarySystemException("Nieznana biblioteka: " + libraryId);
         }
-        
+
         User user = userRepository.findById(userId)
             .orElseThrow(() -> new IllegalArgumentException("Użytkownik nie znaleziony: " + userId));
-        
+
         // Znajdź aktywne konto dla tej biblioteki i użytkownika
         List<LibraryAccount> accounts = accountRepo.findByUserAndLibraryAndEnabledTrue(user, library);
         if (accounts.isEmpty()) {
             throw new LibrarySystemException("Brak aktywnego konta dla biblioteki: " + libraryId + " i użytkownika: " + userId);
         }
-        
+
         // Użyj pierwszego aktywnego konta dla tej biblioteki
         LibraryAccount account = accounts.get(0);
-        
+
         try {
             LibrarySystemClient client = clientFactory.getClient(library);
             LibrarySession session = client.login(

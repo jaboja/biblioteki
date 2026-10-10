@@ -2,7 +2,6 @@ package pl.jaboja.biblioteki.auth;
 
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
-import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpHeaders;
@@ -39,7 +38,7 @@ public class AuthController {
     public ResponseEntity<AuthResponse> login(
             @RequestBody LoginRequest loginRequest,
             HttpServletResponse response) {
-        
+
         Authentication authentication = authenticationManager.authenticate(
             new UsernamePasswordAuthenticationToken(
                 loginRequest.username(),
@@ -48,7 +47,7 @@ public class AuthController {
         );
 
         String token = jwtService.generateToken((User) authentication.getPrincipal());
-        
+
         // Also set cookie for web login form
         ResponseCookie cookie = ResponseCookie.from("jwt", token)
             .httpOnly(true)
@@ -56,7 +55,7 @@ public class AuthController {
             .path("/")
             .maxAge(Duration.ofHours(24))
             .build();
-        
+
         return ResponseEntity.ok()
             .header(HttpHeaders.SET_COOKIE, cookie.toString())
             .body(new AuthResponse(token));
@@ -74,7 +73,7 @@ public class AuthController {
             .path("/")
             .maxAge(0)
             .build();
-        
+
         return ResponseEntity.ok()
             .header(HttpHeaders.SET_COOKIE, cookie.toString())
             .build();
@@ -95,11 +94,11 @@ public class AuthController {
         }
         String username = jwtService.extractUsername(token);
         String roles = jwtService.getRolesFromToken(token);
-        
+
         User user = new User();
         user.setUsername(username);
         user.setRoles(roles);
-        
+
         String newToken = jwtService.generateToken(user);
         return ResponseEntity.ok(new AuthResponse(newToken));
     }

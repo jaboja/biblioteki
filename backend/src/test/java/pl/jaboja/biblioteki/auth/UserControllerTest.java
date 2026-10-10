@@ -6,10 +6,10 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.webmvc.test.autoconfigure.AutoConfigureMockMvc;
+import org.springframework.context.annotation.Import;
 import org.springframework.http.MediaType;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
-import org.springframework.context.annotation.Import;
 import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
@@ -49,7 +49,7 @@ class UserControllerTest {
         adminUser = new User(1L, "admin", "encodedPassword", "Admin User", true, "ADMIN");
         regularUser = new User(2L, "user1", "encodedPassword", "Regular User", true, "USER");
         targetUser = new User(3L, "user2", "encodedPassword", "Target User", true, "USER");
-        
+
         // Configure mock to return appropriate users
         when(userService.findByUsername("admin")).thenReturn(Optional.of(adminUser));
         when(userService.findByUsername("user1")).thenReturn(Optional.of(regularUser));

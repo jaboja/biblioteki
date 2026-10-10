@@ -19,7 +19,7 @@ import java.util.stream.Stream;
 @Getter
 @Setter
 public class User implements UserDetails {
-    
+
     public User() {}  // No-arg constructor for JPA
 
     @Id

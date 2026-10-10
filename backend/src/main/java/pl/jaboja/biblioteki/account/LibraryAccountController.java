@@ -82,7 +82,7 @@ public class LibraryAccountController {
         if (currentUser == null) {
             throw new IllegalStateException("Użytkownik nie jest uwierzytelniony");
         }
-        
+
         var account = new LibraryAccount();
         account.setUser(currentUser);
         account.setLibrary(req.library());
@@ -109,15 +109,15 @@ public class LibraryAccountController {
         if (currentUser == null) {
             throw new IllegalStateException("Użytkownik nie jest uwierzytelniony");
         }
-        
+
         var account = repo.findById(id)
             .orElseThrow(() -> new jakarta.persistence.EntityNotFoundException("Konto nie znalezione: " + id));
-        
+
         // Sprawdź czy konto należy do aktualnego użytkownika
         if (!account.getUser().getId().equals(currentUser.getId())) {
             throw new SecurityException("Brak uprawnień: konto należy do innego użytkownika");
         }
-        
+
         if (req.username() != null)  account.setUsername(req.username());
         if (req.password() != null && !req.password().isBlank()) account.setPassword(req.password());
         account.setEnabled(req.enabled());
@@ -141,15 +141,15 @@ public class LibraryAccountController {
         if (currentUser == null) {
             throw new IllegalStateException("Użytkownik nie jest uwierzytelniony");
         }
-        
+
         var account = repo.findById(id)
             .orElseThrow(() -> new jakarta.persistence.EntityNotFoundException("Konto nie znalezione: " + id));
-        
+
         // Sprawdź czy konto należy do aktualnego użytkownika
         if (!account.getUser().getId().equals(currentUser.getId())) {
             throw new SecurityException("Brak uprawnień: konto należy do innego użytkownika");
         }
-        
+
         repo.deleteById(id);
     }
 

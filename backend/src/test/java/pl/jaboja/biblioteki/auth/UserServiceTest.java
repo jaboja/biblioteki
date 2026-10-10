@@ -177,7 +177,7 @@ class UserServiceTest {
         when(userRepository.countByRolesContainingAndEnabledTrue("ADMIN")).thenReturn(1L);
 
         User result = userService.updateUser(user, null);
-        
+
         assertNotNull(result);
         verify(userRepository).save(any(User.class));
     }

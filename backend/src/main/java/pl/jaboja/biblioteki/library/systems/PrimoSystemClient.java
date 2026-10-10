@@ -175,7 +175,7 @@ public class PrimoSystemClient implements LibrarySystemClient {
     @Override
     public void renewLoan(LibrarySession session, String loanId) {
         var lib = session.library();
-        
+
         // loanID ma postać "LIBRARYID_rawLoanId" – wyodrębnij rawLoanId
         String rawId = loanId.contains("_") ? 
             loanId.substring(loanId.indexOf("_") + 1) : loanId;
@@ -196,7 +196,7 @@ public class PrimoSystemClient implements LibrarySystemClient {
                 .header("Sec-Fetch-Mode",   "cors")
                 .header("Sec-Fetch-Dest",   "empty")
                 .timeout(HttpConfig.TIMEOUT);
-            
+
             if (lib.isNde()) {
                 reqBuilder.header("is-nde", "true");
             }

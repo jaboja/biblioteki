@@ -22,7 +22,7 @@ public class SecurityConfig {
     public SecurityFilterChain securityFilterChain(HttpSecurity http, JwtAuthenticationFilter jwtAuthenticationFilter) {
         http
             .csrf(csrf -> csrf.disable())
-            
+
             .authorizeHttpRequests(auth -> auth
                 // Public endpoints
                 .requestMatchers("/", "/login", "/login.html", "/css/**", "/js/**", "/error").permitAll()

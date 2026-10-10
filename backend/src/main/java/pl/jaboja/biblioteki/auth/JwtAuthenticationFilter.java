@@ -36,7 +36,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
         // Check if there's already an authentication in the SecurityContext (e.g., from @WithMockUser in tests)
         Authentication existingAuth = SecurityContextHolder.getContext().getAuthentication();
-        
+
         if (existingAuth == null || !existingAuth.isAuthenticated()) {
             // No existing authentication, try to process JWT token
             final String token = getTokenFromRequest(request);
