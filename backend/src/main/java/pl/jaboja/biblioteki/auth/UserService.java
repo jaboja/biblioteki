@@ -80,14 +80,11 @@ public class UserService implements UserDetailsService {
         if (password != null) {
             user.setPassword(passwordEncoder.encode(password));
         }
-        
-        // Check if this is the last admin being disabled
-        if (user.getRoles().contains("ADMIN") && !user.isEnabled()) {
-            if (isLastAdmin(user)) {
-                throw new AccessDeniedException("Cannot disable the last admin account");
-            }
+
+        if (!user.isEnabled() && isLastAdmin(user)) {
+            throw new AccessDeniedException("Cannot disable the last admin account");
         }
-        
+
         return userRepository.save(user);
     }
 
