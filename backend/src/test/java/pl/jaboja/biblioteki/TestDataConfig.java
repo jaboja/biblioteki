@@ -6,6 +6,7 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.boot.test.context.TestConfiguration;
 import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Primary;
 import org.springframework.web.filter.OncePerRequestFilter;
 
 import java.io.IOException;
@@ -23,7 +24,8 @@ public class TestDataConfig {
      * This allows @WithMockUser to work without JWT tokens
      */
     @Bean
-    public OncePerRequestFilter jwtAuthenticationFilter() {
+    @Primary
+    public OncePerRequestFilter testJwtAuthenticationFilter() {
         return new OncePerRequestFilter() {
             @Override
             protected void doFilterInternal(
