@@ -1,9 +1,74 @@
+:root {
+    /* Light scheme (default) */
+    --color-bg-primary: #f5f5f5;
+    --color-bg-secondary: white;
+    --color-bg-tertiary: #f8f9fa;
+    --color-text-primary: #333;
+    --color-text-secondary: #2c3e50;
+    --color-text-muted: #7f8c8d;
+    --color-text-light: #666;
+    --color-text-inverse: white;
+    --color-accent-primary: #3498db;
+    --color-accent-primary-hover: #2980b9;
+    --color-accent-success: #27ae60;
+    --color-accent-success-hover: #219653;
+    --color-accent-warning: #e74c3c;
+    --color-accent-danger: #c0392b;
+    --color-accent-info: #3498db;
+    --color-border-light: #ecf0f1;
+    --color-border-medium: #dee2e6;
+    --color-border-strong: #ddd;
+    --color-error-bg: #f8d7da;
+    --color-error-text: #721c24;
+    --color-error-border: #f5c6cb;
+    --color-disabled: #95a5a6;
+    --color-info-bg: #f8f9fa;
+    --color-book-badge: #bdf;
+    --color-shadow: rgba(0,0,0,0.1);
+    --color-tab-active-border: #3498db;
+}
+
+@media (prefers-color-scheme: dark) {
+    :root {
+        /* Dark scheme */
+        --color-bg-primary: #1a1a1a;
+        --color-bg-secondary: #2d2d2d;
+        --color-bg-tertiary: #252525;
+        --color-text-primary: #e0e0e0;
+        --color-text-secondary: #f0f0f0;
+        --color-text-muted: #8a8a8a;
+        --color-text-light: #aaa;
+        --color-accent-primary: #3a86ff;
+        --color-accent-primary-hover: #2980b9;
+        --color-accent-success: #219653;
+        --color-accent-success-hover: #1b7e46;
+        --color-accent-warning: #ff851b;
+        --color-accent-danger: #ff4444;
+        --color-accent-info: #3a86ff;
+        --color-border-light: #3a3a3a;
+        --color-border-medium: #444;
+        --color-border-strong: #555;
+        --color-error-bg: #4a2222;
+        --color-error-text: #ff8888;
+        --color-error-border: #662222;
+        --color-disabled: #444;
+        --color-info-bg: #252525;
+        --color-book-badge: #3a3a5a;
+        --color-shadow: rgba(0,0,0,0.3);
+        --color-tab-active-border: #3a86ff;
+    }
+
+    body {
+        background-image: url("https://www.toptal.com/designers/subtlepatterns/uploads/mosaic.png");
+    }
+}
+
 body {
     font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, sans-serif;
     margin: 0;
     padding: 20px;
-    background-color: #f5f5f5;
-    color: #333;
+    background-color: var(--color-bg-primary);
+    color: var(--color-text-primary);
 }
 
 .container {
@@ -13,8 +78,8 @@ body {
 
 button {
     padding: 5px 10px;
-    background-color: #3498db;
-    color: white;
+    background-color: var(--color-accent-primary);
+    color: var(--color-text-inverse);
     border: none;
     border-radius: 4px;
     cursor: pointer;
@@ -23,11 +88,11 @@ button {
 }
 
 button:hover {
-    background-color: #2980b9;
+    background-color: var(--color-accent-primary-hover);
 }
 
 button:disabled {
-    background-color: #95a5a6;
+    background-color: var(--color-disabled);
     cursor: not-allowed;
 }
 
@@ -39,30 +104,30 @@ button:disabled {
 }
 
 .stat-card {
-    background: white;
+    background: var(--color-bg-secondary);
     padding: 15px 20px;
     border-radius: 8px;
-    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    box-shadow: 0 2px 4px var(--color-shadow);
 }
 
 .stat-value {
     font-size: 24px;
     font-weight: bold;
-    color: #2c3e50;
+    color: var(--color-text-secondary);
 }
 
 .stat-label {
-    color: #7f8c8d;
+    color: var(--color-text-muted);
     font-size: 14px;
 }
 
 .error-box {
-    background-color: #f8d7da;
-    color: #721c24;
+    background-color: var(--color-error-bg);
+    color: var(--color-error-text);
     padding: 15px;
     border-radius: 4px;
     margin-bottom: 20px;
-    border: 1px solid #f5c6cb;
+    border: 1px solid var(--color-error-border);
 }
 
 .error-title {
@@ -71,9 +136,9 @@ button:disabled {
 }
 
 .loans-table {
-    background: white;
+    background: var(--color-bg-secondary);
     border-radius: 8px;
-    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    box-shadow: 0 2px 4px var(--color-shadow);
     overflow: hidden;
 }
 
@@ -85,22 +150,22 @@ table {
 th, td {
     padding: 12px 15px;
     text-align: left;
-    border-bottom: 1px solid #ecf0f1;
+    border-bottom: 1px solid var(--color-border-light);
 }
 
 th {
-    background-color: #f8f9fa;
+    background-color: var(--color-bg-tertiary);
     font-weight: 600;
-    color: #2c3e50;
+    color: var(--color-text-secondary);
 }
 
 tr:hover {
-    background-color: #f5f5f5;
+    background-color: var(--color-bg-primary);
 }
 
 #loansTableBody td > b {
     font-family: monospace;
-    background: #bdf;
+    background: var(--color-book-badge);
     padding: .2rem 0;
     border-radius: .5rem;
     display: inline-block;
@@ -125,31 +190,31 @@ td h3 {
 }
 
 .due-soon {
-    color: #e74c3c;
+    color: var(--color-accent-warning);
     font-weight: 500;
 }
 .due-overdue {
-    color: #c0392b;
+    color: var(--color-accent-danger);
     font-weight: bold;
 }
 
 .renewable::after {
-    color: #27ae60;
+    color: var(--color-accent-success);
     content: " +";
 }
 .not-renewable::after {
-    color: #e74c3c;
+    color: var(--color-accent-warning);
     content: " !";
 }
 .unknown-renewable::after {
-    color: #95a5a6;
+    color: var(--color-text-muted);
     content: " ?";
 }
 
 /* Renew button styles */
 .renew-btn {
-    background-color: #27ae60;
-    color: white;
+    background-color: var(--color-accent-success);
+    color: var(--color-text-inverse);
     border: none;
     border-radius: 4px;
     padding: 5px 10px;
@@ -159,11 +224,11 @@ td h3 {
 }
 
 .renew-btn:hover {
-    background-color: #219653;
+    background-color: var(--color-accent-success-hover);
 }
 
 .renew-btn:disabled {
-    background-color: #95a5a6;
+    background-color: var(--color-disabled);
     cursor: not-allowed;
 }
 
@@ -176,18 +241,18 @@ td h3 {
 .loading {
     text-align: center;
     padding: 20px;
-    color: #7f8c8d;
+    color: var(--color-text-muted);
 }
 
 .refresh-time {
     font-size: 14px;
-    color: #7f8c8d;
+    color: var(--color-text-muted);
     text-align: right;
     margin: 10px;
 }
 
 .logout-link {
-    color: #e74c3c;
+    color: var(--color-accent-warning);
     text-decoration: none;
 }
 
@@ -198,7 +263,7 @@ td h3 {
 .tabs {
     margin-bottom: 20px;
     justify-content: space-between;
-    border-bottom: 1px solid #dee2e6;
+    border-bottom: 1px solid var(--color-border-medium);
 }
 
 .controls, .tabs {
@@ -224,18 +289,18 @@ td h3 {
     border-bottom: 3px solid transparent;
     cursor: pointer;
     font-size: 16px;
-    color: #666;
+    color: var(--color-text-light);
     transition: all 0.2s;
 }
 
 .tab-button:hover {
-    color: #2c3e50;
-    background: #f8f9fa;
+    color: var(--color-text-secondary);
+    background: var(--color-bg-tertiary);
 }
 
 .tab-button.active {
-    color: #2c3e50;
-    border-bottom-color: #3498db;
+    color: var(--color-text-secondary);
+    border-bottom-color: var(--color-tab-active-border);
     font-weight: 600;
 }
 
@@ -286,16 +351,18 @@ td h3 {
 .form-group input {
     width: 100%;
     padding: 8px;
-    border: 1px solid #ddd;
+    border: 1px solid var(--color-border-strong);
     border-radius: 4px;
+    background-color: var(--color-bg-secondary);
+    color: var(--color-text-primary);
 }
 
 .info-box {
     margin-top: 20px;
     padding: 15px;
-    background: #f8f9fa;
-    border: 1px solid #dee2e6;
-    color: #666;
+    background: var(--color-info-bg);
+    border: 1px solid var(--color-border-medium);
+    color: var(--color-text-light);
 }
 
 .info-box p {
