@@ -4,6 +4,19 @@ import { checkedFetch, logout } from './utils/auth';
 const today = new Date();
 today.setHours(0, 0, 0, 0);
 
+type SortColumn = 'dueDate' | 'location' | 'title';
+type SortDirection = 'asc' | 'desc';
+
+interface SortState {
+    column: SortColumn;
+    direction: SortDirection;
+}
+
+let sortState: SortState = {
+    column: 'dueDate',
+    direction: 'asc'
+};
+
 async function loadLoans(): Promise<void> {
     try {
         const response = await checkedFetch('/api/loans');
@@ -48,6 +61,41 @@ async function renewLoan(loanId: string): Promise<void> {
     }
 }
 
+function getLocationString(loan: Loan): string {
+    return (
+        loan.location || loan.libraryId || loan.libraryName || ''
+    ).toLocaleLowerCase();
+}
+
+function getSortIndicator(column: SortColumn): string {
+    if (sortState.column !== column) {
+        return '';
+    }
+    return sortState.direction === 'asc' ? 'sorted-asc' : 'sorted-desc';
+}
+
+function updateSortIndicators(): void {
+    const headers = document.querySelectorAll('th.sortable');
+    headers.forEach(header => {
+        const column = header.getAttribute('data-sort') as SortColumn;
+        const indicator = getSortIndicator(column);
+        header.className = `sortable ${indicator}`.trim();
+    });
+}
+
+function setSort(column: SortColumn): void {
+    // Reset to default sorting if clicking on the same column that's currently sorted
+    if (sortState.column === column) {
+        // Toggle direction or reset to default
+        sortState.direction = sortState.direction === 'asc' ? 'desc' : 'asc';
+    } else {
+        // Switch to new column with ascending direction
+        sortState.column = column;
+        sortState.direction = 'asc';
+    }
+    updateSortIndicators();
+}
+
 export function displayLoans(data: LoansResponse): void {
     const today = new Date();
     today.setHours(0, 0, 0, 0);
@@ -79,12 +127,31 @@ export function displayLoans(data: LoansResponse): void {
         return;
     }
 
-    // Sort loans by due date (soonest first)
+    // Sort loans based on current sort state
     loans.sort((a: Loan, b: Loan) => {
-        if (!a.dueDate && !b.dueDate) return 0;
-        if (!a.dueDate) return 1;
-        if (!b.dueDate) return -1;
-        return new Date(a.dueDate).getTime() - new Date(b.dueDate).getTime();
+        switch (sortState.column) {
+            case 'dueDate':
+                if (!a.dueDate && !b.dueDate) return 0;
+                if (!a.dueDate) return 1;
+                if (!b.dueDate) return -1;
+                return sortState.direction === 'asc'
+                    ? new Date(a.dueDate).getTime() - new Date(b.dueDate).getTime()
+                    : new Date(b.dueDate).getTime() - new Date(a.dueDate).getTime();
+            case 'location':
+                const locA = getLocationString(a);
+                const locB = getLocationString(b);
+                return sortState.direction === 'asc'
+                    ? locA.localeCompare(locB)
+                    : locB.localeCompare(locA);
+            case 'title':
+                const titleA = a.title || '';
+                const titleB = b.title || '';
+                return sortState.direction === 'asc'
+                    ? titleA.localeCompare(titleB)
+                    : titleB.localeCompare(titleA);
+            default:
+                return 0;
+        }
     });
 
     // Create table rows
@@ -202,6 +269,18 @@ export function initLoansPage(): void {
         });
     }
 
+    // Set up event listeners for sortable headers
+    const sortableHeaders = document.querySelectorAll('th.sortable');
+    sortableHeaders.forEach(header => {
+        header.addEventListener('click', () => {
+            const column = header.getAttribute('data-sort') as SortColumn;
+            if (column) {
+                setSort(column);
+                loadLoans();
+            }
+        });
+    });
+
     // Set up event listeners for renew buttons (using event delegation)
     const loansTableBody = document.getElementById('loansTableBody');
     if (loansTableBody) {
@@ -215,6 +294,9 @@ export function initLoansPage(): void {
             }
         });
     }
+
+    // Initialize sort indicators
+    updateSortIndicators();
 
     // Initialize on page load
     loadLoans();
