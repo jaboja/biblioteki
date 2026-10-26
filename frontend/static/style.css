@@ -12,6 +12,7 @@
     --color-accent-primary-hover: #2980b9;
     --color-accent-success: #27ae60;
     --color-accent-success-hover: #219653;
+    --color-accent-weak-warning: #c9a010;
     --color-accent-warning: #e74c3c;
     --color-accent-danger: #c0392b;
     --color-accent-info: #3498db;
@@ -42,6 +43,7 @@
         --color-accent-primary-hover: #2980b9;
         --color-accent-success: #219653;
         --color-accent-success-hover: #1b7e46;
+        --color-accent-weak-warning: #ffc850;
         --color-accent-warning: #ff851b;
         --color-accent-danger: #ff4444;
         --color-accent-info: #3a86ff;
@@ -190,6 +192,10 @@ td h3 {
 }
 
 .due-soon {
+    color: var(--color-accent-weak-warning);
+    font-weight: 500;
+}
+.due-very-soon {
     color: var(--color-accent-warning);
     font-weight: 500;
 }

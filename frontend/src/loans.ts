@@ -99,10 +99,24 @@ export function displayLoans(data: LoansResponse): void {
             const daysDiff = Math.floor((dueDate.getTime() - today.getTime()) / (1000 * 60 * 60 * 24));
             if (dueDate < today) { 
                 dueDateClass = 'due-overdue';
-                dueDateText += ` (${Math.abs(daysDiff)} dni po terminie)`;
-            } else if (daysDiff <= 3) { 
-                dueDateClass = 'due-soon';
-                dueDateText += ` (${daysDiff} dni do terminu)`;
+                if (daysDiff === -1) {
+                    dueDateText += ` (wczoraj)`;
+                } else if (daysDiff === -2) {
+                    dueDateText += ` (przedwczoraj)`;
+                } else {
+                    dueDateText += ` (${Math.abs(daysDiff)} dni po)`;
+                }
+            } else if (daysDiff <= 7) {
+                dueDateClass = daysDiff <= 3 ? 'due-very-soon' : 'due-soon';
+                if (daysDiff === 0) {
+                    dueDateText += ` (dzisiaj)`;
+                } else if (daysDiff === 1) {
+                    dueDateText += ` (jutro)`;
+                } else if (daysDiff === 2) {
+                    dueDateText += ` (pojutrze)`;
+                } else {
+                    dueDateText += ` (${daysDiff} dni)`;
+                }
             }
         }
 
