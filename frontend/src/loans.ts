@@ -75,7 +75,7 @@ function getSortIndicator(column: SortColumn): string {
 }
 
 function updateSortIndicators(): void {
-    const headers = document.querySelectorAll('th.sortable');
+    const headers = document.querySelectorAll('.sortable');
     headers.forEach(header => {
         const column = header.getAttribute('data-sort') as SortColumn;
         const indicator = getSortIndicator(column);
@@ -270,9 +270,11 @@ export function initLoansPage(): void {
     }
 
     // Set up event listeners for sortable headers
-    const sortableHeaders = document.querySelectorAll('th.sortable');
+    const sortableHeaders = document.querySelectorAll('.sortable');
     sortableHeaders.forEach(header => {
-        header.addEventListener('click', () => {
+        header.addEventListener('click', (ev) => {
+            ev.stopPropagation();
+            ev.preventDefault();
             const column = header.getAttribute('data-sort') as SortColumn;
             if (column) {
                 setSort(column);
