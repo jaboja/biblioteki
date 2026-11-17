@@ -1,16 +1,17 @@
 package pl.jaboja.biblioteki.mcp.tools;
 
+import java.util.List;
+import java.util.stream.Stream;
+
 import org.springframework.ai.mcp.annotation.McpTool;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.ai.mcp.annotation.context.McpSyncRequestContext;
+
 import pl.jaboja.biblioteki.account.LibraryAccount;
 import pl.jaboja.biblioteki.account.LibraryAccountRepository;
 import pl.jaboja.biblioteki.account.LibraryResponse;
 import pl.jaboja.biblioteki.auth.User;
 import pl.jaboja.biblioteki.library.LibraryDefinition;
-
-import java.util.List;
-import java.util.stream.Stream;
+import pl.jaboja.biblioteki.mcp.McpUserResolver;
 
 /**
  * MCP tools for library account operations.
@@ -18,6 +19,7 @@ import java.util.stream.Stream;
  * Note: Account modification (create, update, delete) is NOT exposed via MCP.
  */
 public class AccountTools {
+
     /**
      * MCP-specific DTO for library account information.
      * Excludes username and password for security.
@@ -38,16 +40,15 @@ public class AccountTools {
 
     private final LibraryAccountRepository accountRepository;
 
-    public AccountTools(LibraryAccountRepository accountRepository) {
+    private final McpUserResolver userResolver;
+
+    public AccountTools(LibraryAccountRepository accountRepository, McpUserResolver userResolver) {
         this.accountRepository = accountRepository;
+        this.userResolver = userResolver;
     }
 
-    private User getCurrentUser() {
-        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        if (authentication != null && authentication.getPrincipal() instanceof User) {
-            return ((User) authentication.getPrincipal());
-        }
-        throw new IllegalStateException("Użytkownik nie jest uwierzytelniony");
+    private User getCurrentUser(McpSyncRequestContext context) {
+        return userResolver.resolveUser(context.transportContext());
     }
 
     /**
@@ -60,8 +61,8 @@ public class AccountTools {
         description = "Zwraca listę aktywnych kont dostępu do bibliotek (bez nazw użytkowników i haseł) dla aktualnie zalogowanego użytkownika.",
         title = "List Accounts"
     )
-    public List<McpAccountResponse> listAccounts() {
-        User currentUser = getCurrentUser();
+    public List<McpAccountResponse> listAccounts(McpSyncRequestContext context) {
+        User currentUser = getCurrentUser(context);
         return accountRepository.findByUserAndEnabledTrue(currentUser)
             .stream()
             .map(McpAccountResponse::from)
