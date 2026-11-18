@@ -1,29 +1,13 @@
 /**
  * Authentication utilities shared across all frontend modules.
+ *
+ * The JWT is stored in an HttpOnly cookie set by the backend
+ * (POST /api/auth/login). HttpOnly cookies cannot be read or cleared
+ * from JavaScript, so the frontend relies on the browser sending the
+ * cookie automatically with same-origin requests. Logout must therefore
+ * be done by calling the backend, which clears the cookie server-side
+ * via a Set-Cookie header.
  */
-
-/**
- * Get JWT token from localStorage or cookies.
- */
-export function getToken(): string | null {
-    // Check cookies
-    const cookies = document.cookie.split(';');
-    for (let i = 0; i < cookies.length; i++) {
-        const cookie = cookies[i].trim();
-        if (cookie.startsWith('jwt=')) {
-            return cookie.substring(4);
-        }
-    }
-    
-    return null;
-}
-
-/**
- * Clear authentication token from storage.
- */
-export function clearToken(): void {
-    document.cookie = 'jwt=; Max-Age=0; path=/;';
-}
 
 /**
  * Redirect to login page.
@@ -33,10 +17,14 @@ export function redirectToLogin(): void {
 }
 
 /**
- * Perform logout by clearing token and redirecting to login.
+ * Perform logout by calling the backend, then redirect to the login page.
  */
-export function logout(): void {
-    clearToken();
+export async function logout(): Promise<void> {
+    try {
+        await fetch('/api/auth/logout', { method: 'POST' });
+    } catch {
+        // Network errors are ignored - we always redirect to login.
+    }
     redirectToLogin();
 }
 
@@ -45,21 +33,12 @@ export function logout(): void {
  * If the response is 401 or 403, it clears the token and redirects.
  */
 export async function checkedFetch(input: RequestInfo | URL, init?: RequestInit): Promise<Response> {
-    const response = await fetch(input, {
-        ...init,
-        headers: {
-            ...init?.headers,
-            'Authorization': `Bearer ${getToken() || ''}`
-        }
-    });
-    
+    const response = await fetch(input, init);
+
     if (response.status === 401 || response.status === 403) {
-        clearToken();
         redirectToLogin();
-        // This will throw since we're redirecting, but we need to return something
-        // The redirect happens before this, so the throw won't be reached
         throw new Error('Unauthorized - redirected to login');
     }
-    
+
     return response;
 }
