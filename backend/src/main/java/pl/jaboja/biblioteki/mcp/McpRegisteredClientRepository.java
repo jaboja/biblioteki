@@ -20,8 +20,20 @@ public class McpRegisteredClientRepository implements RegisteredClientRepository
     @Override
     public void save(RegisteredClient registeredClient) {
         Assert.notNull(registeredClient, "registeredClient cannot be null");
-        this.byId.put(registeredClient.getId(), registeredClient);
-        this.byClientId.put(registeredClient.getClientId(), registeredClient);
+        String id = registeredClient.getId();
+        String clientId = registeredClient.getClientId();
+        // Drop stale index entries when a save replaces the id->client or
+        // client->id mapping (e.g. re-registration with a rotated clientId).
+        RegisteredClient existingById = this.byId.get(id);
+        if (existingById != null && !existingById.getClientId().equals(clientId)) {
+            this.byClientId.remove(existingById.getClientId(), existingById);
+        }
+        RegisteredClient existingByClientId = this.byClientId.get(clientId);
+        if (existingByClientId != null && !existingByClientId.getId().equals(id)) {
+            this.byId.remove(existingByClientId.getId(), existingByClientId);
+        }
+        this.byId.put(id, registeredClient);
+        this.byClientId.put(clientId, registeredClient);
     }
 
     @Override

@@ -1,6 +1,7 @@
 package pl.jaboja.biblioteki.auth;
 
 import io.swagger.v3.oas.annotations.Operation;
+import jakarta.validation.Valid;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
@@ -9,6 +10,7 @@ import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
@@ -40,6 +42,11 @@ public class UserController {
                 String username = (String) principal;
                 return userService.findByUsername(username)
                     .orElseThrow(() -> new UsernameNotFoundException("User not found: " + username));
+            }
+            // For test contexts where @WithMockUser sets a UserDetails principal
+            if (principal instanceof UserDetails userDetails) {
+                return userService.findByUsername(userDetails.getUsername())
+                    .orElseThrow(() -> new UsernameNotFoundException("User not found: " + userDetails.getUsername()));
             }
         }
         throw new AccessDeniedException("Not authenticated");
@@ -126,7 +133,7 @@ public class UserController {
     @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<UserResponse> createUser(
             @Parameter(description = "Dane nowego użytkownika")
-            @RequestBody UserRequest request) {
+            @Valid @RequestBody UserRequest request) {
         User user = new User();
         user.setUsername(request.username());
         user.setPassword(request.password());
@@ -156,7 +163,7 @@ public class UserController {
             @Parameter(description = "ID użytkownika")
             @PathVariable Long id,
             @Parameter(description = "Dane do aktualizacji")
-            @RequestBody UserRequest request) {
+            @Valid @RequestBody UserRequest request) {
         User user = getCurrentUserFromDatabase();
 
         boolean isAdmin = user.getRoles().contains("ADMIN");
@@ -196,7 +203,7 @@ public class UserController {
     @PutMapping("/me")
     public ResponseEntity<UserResponse> updateSelf(
             @Parameter(description = "Dane do aktualizacji")
-            @RequestBody UserRequest.SelfUpdateRequest request) {
+            @Valid @RequestBody UserRequest.SelfUpdateRequest request) {
         User user = getCurrentUserFromDatabase();
         if (request.username() != null) {
             user.setUsername(request.username());
