@@ -126,7 +126,7 @@ public class LoansService {
             LibrarySession session = client.login(
                 account.getLibrary(), account.getUsername(), account.getPassword());
             client.renewLoan(session, loanId);
-            // Po pomyślnej prolongacie odśwież cache.
+            // Clear cache after successfully renewing the loan.
             // NOT refresh(): self-invocation bypasses the Spring AOP proxy,
             // so the @CacheEvict would never run. Evict the user's cache
             // entry directly through the CacheManager instead.

@@ -64,7 +64,7 @@ biblioteki:
     # application-prod.yml (auth-mode: oauth) and override the values below.
     auth-mode: local
     # Username for local calls (dev)
-    local-username: ${MCP_LOCAL_USERNAME:user}
+    local-username: ${MCP_LOCAL_USERNAME:admin}
     # Issuer / resource identifier for OAuth 2.1
     issuer-url: ${MCP_ISSUER_URL:http://127.0.0.1:8292}
 

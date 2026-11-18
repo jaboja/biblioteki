@@ -33,7 +33,7 @@ public class LoansTools {
      */
     @McpTool(
         name = "list_loans",
-        description = "Returns the user's current list of loans from cache (10-minute TTL).",
+        description = "Returns the user's current list of loans (cached with a 10-minute TTL).",
         title = "List Loans"
     )
     public LoansResponse listLoans(McpSyncRequestContext context) {

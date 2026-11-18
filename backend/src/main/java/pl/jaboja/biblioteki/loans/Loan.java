@@ -2,6 +2,7 @@ package pl.jaboja.biblioteki.loans;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
 import io.swagger.v3.oas.annotations.media.Schema;
+import org.jspecify.annotations.NonNull;
 
 import java.time.LocalDate;
 
@@ -32,7 +33,7 @@ public record Loan(
 
     /** Sortowanie: najwcześniejszy termin zwrotu pierwszy, bez daty na końcu. */
     @Override
-    public int compareTo(Loan other) {
+    public int compareTo(@NonNull Loan other) {
         if (this.dueDate == null && other.dueDate == null) return this.title.compareTo(other.title);
         if (this.dueDate == null) return 1;
         if (other.dueDate == null) return -1;

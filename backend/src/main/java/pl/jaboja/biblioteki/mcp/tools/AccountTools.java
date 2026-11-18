@@ -62,7 +62,7 @@ public class AccountTools {
      */
     @McpTool(
         name = "list_accounts",
-        description = "Returns the library accounts of the currently logged-in user; libraries without an account are not visible. The username of each account corresponds to the barcode number on the user's library card. Passwords are never included.",
+        description = "Returns the library accounts of the currently logged-in user; inactive accounts and libraries without an account are not visible. The username of each account corresponds to the barcode number on the user's library card. Passwords are never included.",
         title = "List Accounts"
     )
     public List<McpAccountResponse> listAccounts(McpSyncRequestContext context) {

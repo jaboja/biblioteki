@@ -1,7 +1,11 @@
 {
   "mcpServers": {
     "Biblioteki": {
-      "url": "http://localhost:8292/mcp"
+      "command": "npx",
+      "args": [
+        "mcp-remote",
+        "http://127.0.0.1:8292/mcp"
+      ]
     }
   }
 }
