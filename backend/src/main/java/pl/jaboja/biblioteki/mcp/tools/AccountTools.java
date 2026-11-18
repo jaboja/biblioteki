@@ -1,16 +1,13 @@
 package pl.jaboja.biblioteki.mcp.tools;
 
 import java.util.List;
-import java.util.stream.Stream;
 
 import org.springframework.ai.mcp.annotation.McpTool;
 import org.springframework.ai.mcp.annotation.context.McpSyncRequestContext;
 
 import pl.jaboja.biblioteki.account.LibraryAccount;
 import pl.jaboja.biblioteki.account.LibraryAccountRepository;
-import pl.jaboja.biblioteki.account.LibraryResponse;
 import pl.jaboja.biblioteki.auth.User;
-import pl.jaboja.biblioteki.library.LibraryDefinition;
 import pl.jaboja.biblioteki.mcp.McpUserResolver;
 
 /**
@@ -21,19 +18,23 @@ import pl.jaboja.biblioteki.mcp.McpUserResolver;
 public class AccountTools {
 
     /**
-     * MCP-specific DTO for library account information.
+     * MCP-specific DTO joining a user's library account with its library definition.
+     * libraryId = library identifier (enum key, as used in loan IDs like 'MBP_12345'),
+     * libraryName = human-readable library name.
      * Excludes username and password for security.
      */
     public record McpAccountResponse(
             Long id,
-            String library,
-            String libraryDisplayName
+            String libraryId,
+            String libraryName,
+            String location
     ) {
         static McpAccountResponse from(LibraryAccount a) {
             return new McpAccountResponse(
                     a.getId(),
                     a.getLibrary().name(),
-                    a.getLibrary().getDisplayName()
+                    a.getLibrary().getDisplayName(),
+                    a.getLibrary().getLocation()
             );
         }
     }
@@ -52,13 +53,13 @@ public class AccountTools {
     }
 
     /**
-     * Lists all enabled library accounts for the current user.
-     * Note: Passwords and usernames are NOT included in the response.
-     * Disabled accounts are omitted from the list.
+     * Lists the current user's library accounts, each joined with its library definition.
+     * Libraries for which the user has no account are not visible.
+     * Usernames and passwords are never included; disabled accounts are omitted.
      */
     @McpTool(
         name = "list_accounts",
-        description = "Zwraca listę aktywnych kont dostępu do bibliotek (bez nazw użytkowników i haseł) dla aktualnie zalogowanego użytkownika.",
+        description = "Returns the currently logged-in user's library accounts, joined with their library definitions. libraryId is the library identifier (as used in loan IDs, e.g. 'MBP' in 'MBP_12345'), libraryName is the human-readable name. Only enabled accounts are returned; libraries without an account are not visible. Usernames and passwords are never included.",
         title = "List Accounts"
     )
     public List<McpAccountResponse> listAccounts(McpSyncRequestContext context) {
@@ -66,21 +67,6 @@ public class AccountTools {
         return accountRepository.findByUserAndEnabledTrue(currentUser)
             .stream()
             .map(McpAccountResponse::from)
-            .toList();
-    }
-
-    /**
-     * Lists all available library definitions.
-     * This is the same data returned by GET /api/accounts/libraries.
-     */
-    @McpTool(
-        name = "list_libraries",
-        description = "Zwraca listę wszystkich dostępnych definicji bibliotek (MBP, DBP, ZNO).",
-        title = "List Libraries"
-    )
-    public List<LibraryResponse> listLibraries() {
-        return Stream.of(LibraryDefinition.values())
-            .map(l -> new LibraryResponse(l.name(), l.getDisplayName(), l.getLocation()))
             .toList();
     }
 }

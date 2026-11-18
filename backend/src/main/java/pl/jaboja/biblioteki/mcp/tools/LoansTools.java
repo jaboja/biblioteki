@@ -33,7 +33,7 @@ public class LoansTools {
      */
     @McpTool(
         name = "list_loans",
-        description = "Pobierz listę wypożyczeń z cache (10-minutowy TTL). Zwraca aktualny stan wypożyczeń z bibliotek.",
+        description = "Returns the user's current list of loans from cache (10-minute TTL).",
         title = "List Loans"
     )
     public LoansResponse listLoans(McpSyncRequestContext context) {
@@ -48,7 +48,7 @@ public class LoansTools {
      */
     @McpTool(
         name = "refresh_loans",
-        description = "Wymusza natychmiastowe odświeżenie danych wypożyczeń z bibliotek, ignorując cache.",
+        description = "Forces an immediate refresh of loan data from the library systems, bypassing the cache.",
         title = "Refresh Loans"
     )
     public LoansResponse refreshLoans(McpSyncRequestContext context) {
@@ -63,12 +63,12 @@ public class LoansTools {
      */
     @McpTool(
         name = "renew_loan",
-        description = "Przetwarza prolongatę pojedynczego wypożyczenia. Wymaga ID wypożyczenia w formacie 'LIBRARYID_rawLoanId' (np. 'MBP_12345').",
+        description = "Renews a single loan. Requires a loan ID in the format 'LIBRARYID_rawLoanId' (e.g. 'MBP_12345').",
         title = "Renew Loan"
     )
     public String renewLoan(McpSyncRequestContext context, String loanId) {
         Long userId = getCurrentUserId(context);
         loansService.renewLoan(userId, loanId);
-        return "Wypożyczenie " + loanId + " przedłużone pomyślnie";
+        return "Loan " + loanId + " renewed successfully";
     }
 }
