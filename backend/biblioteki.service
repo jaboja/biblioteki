@@ -8,7 +8,7 @@ User=biblioteki
 Group=biblioteki
 WorkingDirectory=/opt/biblioteki
 EnvironmentFile=/etc/biblioteki.env
-ExecStart=/usr/bin/java -jar /opt/biblioteki/biblioteki.jar
+ExecStart=/usr/bin/java -jar /opt/biblioteki/biblioteki.jar --spring.profiles.active=prod
 SuccessExitStatus=143
 Restart=always
 RestartSec=30

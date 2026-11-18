@@ -40,7 +40,7 @@ spring:
       server:
         enabled: true
         protocol: STREAMABLE
-        type: ASYNC
+        type: SYNC
         streamable-http:
           mcp-endpoint: /mcp
 
@@ -56,6 +56,17 @@ springdoc:
     operationsSorter: method
     tagsSorter: alpha
     disable-swagger-default-url: true
+
+biblioteki:
+  mcp:
+    # This file is the DEV configuration: local calls without token, identity = local-username.
+    # Production: run with the prod profile (--spring.profiles.active=prod), which will load
+    # application-prod.yml (auth-mode: oauth) and override the values below.
+    auth-mode: local
+    # Username for local calls (dev)
+    local-username: ${MCP_LOCAL_USERNAME:user}
+    # Issuer / resource identifier for OAuth 2.1
+    issuer-url: ${MCP_ISSUER_URL:http://127.0.0.1:8292}
 
 logging:
   level:

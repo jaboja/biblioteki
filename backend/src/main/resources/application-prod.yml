@@ -1,0 +1,7 @@
+# Production config — active only in the "prod" profile:
+#   java -jar biblioteki.jar --spring.profiles.active=prod
+# Overwrites dev values from application.yml (local mode inactive)
+biblioteki:
+  mcp:
+    auth-mode: oauth
+    issuer-url: ${MCP_ISSUER_URL:https://biblioteki.jaboja.pl}
