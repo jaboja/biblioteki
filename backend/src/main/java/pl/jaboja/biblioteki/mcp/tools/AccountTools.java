@@ -18,13 +18,15 @@ import pl.jaboja.biblioteki.mcp.McpUserResolver;
 public class AccountTools {
 
     /**
-     * MCP-specific DTO joining a user's library account with its library definition.
-     * libraryId = library identifier (enum key, as used in loan IDs like 'MBP_12345'),
-     * libraryName = human-readable library name.
-     * Excludes username and password for security.
+     * MCP-specific DTO for a user's library account.
+     * username = the account's name in the library system (the barcode number
+     * on the user's library card), libraryId = library identifier (enum key,
+     * as used in loan IDs like 'MBP_12345'), libraryName = human-readable name.
+     * The password is never included.
      */
     public record McpAccountResponse(
             Long id,
+            String username,
             String libraryId,
             String libraryName,
             String location
@@ -32,6 +34,7 @@ public class AccountTools {
         static McpAccountResponse from(LibraryAccount a) {
             return new McpAccountResponse(
                     a.getId(),
+                    a.getUsername(),
                     a.getLibrary().name(),
                     a.getLibrary().getDisplayName(),
                     a.getLibrary().getLocation()
@@ -59,7 +62,7 @@ public class AccountTools {
      */
     @McpTool(
         name = "list_accounts",
-        description = "Returns the currently logged-in user's library accounts, joined with their library definitions. libraryId is the library identifier (as used in loan IDs, e.g. 'MBP' in 'MBP_12345'), libraryName is the human-readable name. Only enabled accounts are returned; libraries without an account are not visible. Usernames and passwords are never included.",
+        description = "Returns the library accounts of the currently logged-in user; libraries without an account are not visible. The username of each account corresponds to the barcode number on the user's library card. Passwords are never included.",
         title = "List Accounts"
     )
     public List<McpAccountResponse> listAccounts(McpSyncRequestContext context) {

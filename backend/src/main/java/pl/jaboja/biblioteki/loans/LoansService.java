@@ -2,6 +2,8 @@ package pl.jaboja.biblioteki.loans;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.cache.Cache;
+import org.springframework.cache.CacheManager;
 import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
@@ -31,6 +33,8 @@ public class LoansService {
     private final LibraryAccountRepository accountRepo;
     private final LibrarySystemClientFactory clientFactory;
     private final UserRepository userRepository;
+
+    private final CacheManager cacheManager;
 
     // Wirtualne wątki Java 21 – idealne do I/O-bound równoległych zadań HTTP
     private final ExecutorService executor = Executors.newVirtualThreadPerTaskExecutor();
@@ -122,8 +126,15 @@ public class LoansService {
             LibrarySession session = client.login(
                 account.getLibrary(), account.getUsername(), account.getPassword());
             client.renewLoan(session, loanId);
-            // Po pomyślnej prolongacie odśwież cache
-            refresh(userId);
+            // Po pomyślnej prolongacie odśwież cache.
+            // NOT refresh(): self-invocation bypasses the Spring AOP proxy,
+            // so the @CacheEvict would never run. Evict the user's cache
+            // entry directly through the CacheManager instead.
+            Cache loansCache = cacheManager.getCache(CacheConfig.LOANS_CACHE);
+            if (loansCache != null) {
+                loansCache.evict(userId);
+                log.info("Cache evicted for user {} after renewing loan {}", userId, loanId);
+            }
             log.info("Pomyślnie przedłużono wypożyczenie {} przy użyciu konta {}", loanId, account.getUsername());
         } catch (LibrarySystemException e) {
             log.error("Błąd podczas przedłużania wypożyczenia {}: {}", loanId, e.getMessage());
