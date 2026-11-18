@@ -59,12 +59,14 @@ springdoc:
 
 biblioteki:
   mcp:
-    # Issuer / resource identifier dla OAuth 2.1 (na produkcji: MCP_ISSUER_URL=https://biblioteki.jaboja.pl)
-    issuer-url: ${MCP_ISSUER_URL:http://127.0.0.1:8292}
-    # auth-mode: oauth (domyslnie) | local — local TYLKO dla developmentu, wymaga jawnej konfiguracji
-    # auth-mode: local
+    # Ten plik = konfiguracja DEV: wywolania lokalne bez tokenu, tozsamosc = local-username.
+    # Produkcja: uruchom z profilem prod (--spring.profiles.active=prod), ktory wczyta
+    # application-prod.yml (auth-mode: oauth) i nadpisze ponizsze wartosci.
+    auth-mode: local
     # Nazwa uzytkownika dla wywolan lokalnych (dev)
     local-username: ${MCP_LOCAL_USERNAME:user}
+    # Issuer / resource identifier dla OAuth 2.1
+    issuer-url: ${MCP_ISSUER_URL:http://127.0.0.1:8292}
 
 logging:
   level:
